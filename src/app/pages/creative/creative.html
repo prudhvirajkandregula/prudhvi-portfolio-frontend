@@ -1,0 +1,71 @@
+<section class="page-hero is-creative">
+  <div class="container">
+    <span class="eyebrow is-creative">Portfolio · Creative</span>
+    <h1>Creative</h1>
+    <p class="lead">
+      Short-form edits, YouTube videos, design and photography. Work that is
+      cut, composed and published — explore it by category.
+    </p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="gallery-title">
+  <div class="container">
+    <div class="section-head reveal" appReveal>
+      <h2 class="section-title" id="gallery-title">Project gallery</h2>
+      <p class="section-subtitle" id="creative-count">{{ countText() }}</p>
+    </div>
+
+    <div
+      id="filter-bar"
+      class="filter-bar reveal"
+      role="group"
+      aria-label="Filter creative projects by category"
+      appReveal
+    >
+      @if (filtersFailed()) {
+        <p>Filters will appear once creative projects can be loaded.</p>
+      } @else {
+        <button
+          type="button"
+          class="filter-btn"
+          [attr.aria-pressed]="activeCategory() === 'All'"
+          (click)="selectCategory('All')"
+        >
+          All
+        </button>
+        @for (category of categories(); track category) {
+          <button
+            type="button"
+            class="filter-btn"
+            [attr.aria-pressed]="activeCategory() === category"
+            (click)="selectCategory(category)"
+          >
+            {{ category }}
+          </button>
+        }
+      }
+    </div>
+
+    <div id="gallery-results" aria-live="polite" class="reveal" appReveal>
+      @switch (status()) {
+        @case ('loading') {
+          <app-state kind="loading" title="Loading creative projects…" [message]="loadingMessage()" />
+        }
+        @case ('error') {
+          <app-state kind="error" title="Creative projects unavailable" [message]="errorMessage()" />
+        }
+        @case ('empty') {
+          <app-state kind="empty" title="No projects in this category yet." [message]="emptyMessage()" />
+        }
+        @case ('ready') {
+          <div class="grid-projects cols-3">
+            @for (project of projects(); track project.slug) {
+              <app-project-card [project]="project" />
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</section>

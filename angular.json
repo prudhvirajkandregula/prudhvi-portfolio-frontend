@@ -25,6 +25,12 @@
               }
             ],
             "styles": [
+              "src/styles/variables.css",
+              "src/styles/base.css",
+              "src/styles/layout.css",
+              "src/styles/components.css",
+              "src/styles/pages.css",
+              "src/styles/home.css",
               "src/styles.css"
             ]
           },
@@ -54,6 +60,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend-angular:build:production"

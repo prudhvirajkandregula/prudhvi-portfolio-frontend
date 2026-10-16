@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================================
+   Global styles beyond the ported portfolio CSS.
+   The portfolio stylesheet set lives in src/styles/*.css and is registered in
+   angular.json in the same cascade order as the original frontend.
+   This file holds Angular-specific resets only.
+   ========================================================================== */

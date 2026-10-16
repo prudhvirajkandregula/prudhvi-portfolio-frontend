@@ -1,0 +1,136 @@
+/* ============================================================================
+   Pages — page-specific compositions (creative, career, project, contact).
+   Note: the landing page styles live in css/home.css, scoped to body.page-home.
+   ========================================================================== */
+
+/* ---------------- Creative ---------------- */
+
+.creative-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ---------------- Career ---------------- */
+
+.career-sections {
+  display: grid;
+  gap: var(--space-16);
+}
+
+.skills-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 620px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1020px) {
+  .skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.career-intro {
+  display: grid;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .career-intro {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+  }
+}
+
+.career-intro__text {
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* ---------------- Project detail ---------------- */
+
+.pd-title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-3xl));
+  max-width: 22ch;
+}
+
+.pd-subhead {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  max-width: 58ch;
+  margin-top: var(--space-5);
+}
+
+.pd-body .prose {
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+  max-width: 66ch;
+  white-space: pre-line;
+}
+
+/* ---------------- Contact ---------------- */
+
+.contact-layout {
+  display: grid;
+  gap: var(--space-12);
+}
+
+@media (min-width: 900px) {
+  .contact-layout {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: var(--space-16);
+  }
+}
+
+.contact-form {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.form-row {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.contact-info {
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+}
+
+.contact-info__blurb {
+  color: var(--color-text-secondary);
+  line-height: var(--lh-snug);
+}
+
+.contact-info__email {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.contact-info__email:hover {
+  color: var(--color-accent);
+}

@@ -1,0 +1,156 @@
+<section class="pd-header">
+  <div class="container narrow">
+    <a
+      class="pd-return"
+      [routerLink]="returnPath()"
+      [attr.aria-label]="returnLabel()"
+    >
+      <app-icon name="arrowLeft" /> {{ returnLabel() }}
+    </a>
+
+    <div id="project-region" aria-live="polite">
+      @switch (state()) {
+        @case ('loading') {
+          <app-state kind="loading" title="Loading project…" [message]="loadingMessage()" />
+        }
+
+        @case ('notfound') {
+          <div class="error-card">
+            <p class="error-card__code">{{ notFoundCode() }}</p>
+            <h1 style="margin-top: var(--space-4)">{{ notFoundTitle() }}</h1>
+            <p
+              class="section-subtitle"
+              style="margin-top: var(--space-4); text-align: center"
+            >
+              {{ notFoundMessage() }}
+            </p>
+            <div class="error-card__actions">
+              <a class="btn btn--primary" routerLink="/creative">Browse creative work</a>
+              <a class="btn btn--accent-cool" routerLink="/career">Browse career work</a>
+              <a class="btn btn--ghost" routerLink="/">Back home</a>
+            </div>
+          </div>
+        }
+
+        @case ('loaderror') {
+          <div class="error-card">
+            <p class="error-card__code">Error</p>
+            <h1 style="margin-top: var(--space-4)">Could not load this project</h1>
+            <p
+              class="section-subtitle"
+              style="margin-top: var(--space-4); text-align: center"
+            >
+              {{ loadErrorMessage() }}
+            </p>
+            <div class="error-card__actions">
+              <button type="button" class="btn btn--primary" (click)="retry()">Try again</button>
+              <a class="btn btn--ghost" routerLink="/">Back home</a>
+            </div>
+          </div>
+        }
+
+        @case ('ready') {
+          <span
+            class="eyebrow"
+            [class.is-career]="isCareer()"
+            [class.is-creative]="!isCareer()"
+          >
+            {{ eyebrowText() }}
+          </span>
+
+          <h1 class="pd-title" id="project-title">{{ titleText() }}</h1>
+
+          @if (project()?.shortDescription) {
+            <p class="pd-subhead">{{ project()!.shortDescription }}</p>
+          }
+
+          <div
+            class="pd-media"
+            [class.is-career]="isCareer()"
+            [class.is-creative]="!isCareer()"
+          >
+            @if (mediaSrc() && !mediaFailed()) {
+              <img
+                [src]="mediaSrc()"
+                [alt]="'Thumbnail for ' + titleText()"
+                loading="lazy"
+                decoding="async"
+                (error)="mediaFailed.set(true)"
+              />
+            }
+            <div
+              class="media-placeholder"
+              [class.is-career]="isCareer()"
+              role="img"
+              [attr.aria-label]="placeholderLabel()"
+            >
+              {{ monogram() }}
+            </div>
+          </div>
+
+          <div class="pd-body">
+            @if (embedUrl()) {
+              <div class="video-embed">
+                <iframe
+                  [src]="embedUrl()"
+                  title="Embedded project video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  loading="lazy"
+                ></iframe>
+              </div>
+            } @else if (directVideoUrl()) {
+              <div class="video-closed">
+                <app-icon name="play" />
+                <p style="margin: 0">This video is hosted externally.</p>
+                <a
+                  [href]="directVideoUrl()"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Watch the video</a
+                >
+              </div>
+            }
+
+            @if (project()?.fullDescription) {
+              <div class="prose">
+                <p>{{ project()!.fullDescription }}</p>
+              </div>
+            }
+
+            @if (externalUrl()) {
+              <div class="pd-actions">
+                <a
+                  class="btn btn--ghost"
+                  [href]="externalUrl()"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <app-icon name="external" />Open original
+                </a>
+              </div>
+            }
+          </div>
+
+          <dl class="pd-meta">
+            <div>
+              <dt>Category</dt>
+              <dd>{{ categoryText() }}</dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{{ typeText() }}</dd>
+            </div>
+            @if (updatedMonth()) {
+              <div>
+                <dt>Updated</dt>
+                <dd>{{ updatedMonth() }}</dd>
+              </div>
+            }
+          </dl>
+        }
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,99 @@
+<section class="home-hero" aria-labelledby="home-title">
+      <div class="container home-hero__inner">
+        <div class="home-hero__copy">
+          <p class="home-hero__eyebrow">
+            <span class="dot" aria-hidden="true">●</span> Creative × Developer
+          </p>
+          <h1 class="home-hero__title" id="home-title">
+            <span style="display: block">Kandregula</span>
+            <span style="display: block">Prudhvi Raj</span>
+          </h1>
+          <p class="home-hero__lead">
+            I cut stories on one screen and build systems on the other — if you
+            found me through either, welcome.
+          </p>
+          <a class="btn btn--primary home-hero__cta" href="#identity">
+            How do you know me?
+          </a>
+        </div>
+
+        <figure class="home-hero__portrait">
+          <img
+            id="hero-portrait"
+            src="/assets/images/portrait.svg"
+            alt="Illustrated portrait of a fictional person, front-facing"
+            width="400"
+            height="500"
+          />
+          <figcaption class="home-hero__portrait-caption">Creative × Developer</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section home-identity" id="identity" aria-labelledby="identity-title" #identitySection>
+  <div class="container">
+    <header class="section-head center reveal" appReveal>
+      <span class="eyebrow">Two sides, one person</span>
+      <h2 class="section-title" id="identity-title">How do you know me?</h2>
+      <p class="section-subtitle">
+        Whichever doorway you arrived through, this is its home.
+      </p>
+    </header>
+
+    <div class="home-identity__grid">
+      <article class="identity-card identity-card--creator reveal" appReveal #creatorCard>
+        <div class="identity-card__head">
+          <span class="identity-card__index" aria-hidden="true">01</span>
+          <span class="identity-card__key">Creative</span>
+        </div>
+
+        <h3 class="identity-card__title">Creator</h3>
+
+        <p class="identity-card__desc">
+          Video editor and visual storyteller — short-form edits,
+          YouTube, design and photography that make ideas watchable.
+        </p>
+
+        <ul class="identity-card__tags" aria-label="Creative disciplines">
+          <li class="tag tag--creative">Video editing</li>
+          <li class="tag tag--creative">YouTube</li>
+          <li class="tag tag--creative">Design</li>
+        </ul>
+
+        <a class="identity-card__link" routerLink="/creative">
+          Explore creative work
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </article>
+
+      <div class="identity-portrait">
+        <div class="portrait-interactive" aria-hidden="true" #portraitSlot></div>
+      </div>
+
+      <article class="identity-card identity-card--developer reveal" appReveal #developerCard>
+        <div class="identity-card__head">
+          <span class="identity-card__index" aria-hidden="true">02</span>
+          <span class="identity-card__key">Developer</span>
+        </div>
+
+        <h3 class="identity-card__title">Developer</h3>
+
+        <p class="identity-card__desc">
+          Full-stack engineer shaping software end to end — Java,
+          Spring, databases and the web tooling that ships it to people.
+        </p>
+
+        <ul class="identity-card__tags" aria-label="Developer stack">
+          <li class="tag tag--career">Java &amp; Spring</li>
+          <li class="tag tag--career">Full stack</li>
+          <li class="tag tag--career">Databases</li>
+        </ul>
+
+        <a class="identity-card__link" routerLink="/career">
+          Explore developer profile
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>

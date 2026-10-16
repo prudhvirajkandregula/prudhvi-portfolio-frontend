@@ -1,0 +1,432 @@
+/* ============================================================================
+   Homepage (index.html) — light, minimal landing theme.
+   Scoped under body.page-home so the Creative, Career, Contact and Project
+   Detail pages keep the dark portfolio theme defined in variables.css.
+   ============================================================================ */
+
+/* ---- Page-scoped theme tokens: warm-white canvas, charcoal type ---- */
+.page-home {
+  --lh-bg: #f7f6f3;
+  --lh-surface: #ffffff;
+  --lh-surface-soft: #f2f0eb;
+  --lh-surface-hover: #f1efe9;
+  --lh-border: #e6e4de;
+  --lh-border-strong: #d9d6cf;
+  --lh-text: #1b1a18;
+  --lh-text-secondary: #6b6862;
+  --lh-text-muted: #9c988f;
+  --lh-dot: rgba(32, 31, 29, 0.2);
+
+  /* Remap the shared design tokens the common components consume, so the
+     header, footer, buttons, tags and states all read as light + neutral. */
+  --color-bg: var(--lh-bg);
+  --color-bg-elevated: var(--lh-bg);
+  --color-bg-inset: var(--lh-surface);
+  --color-surface: var(--lh-surface);
+  --color-surface-hover: var(--lh-surface-hover);
+  --color-border: var(--lh-border);
+  --color-border-strong: var(--lh-border-strong);
+  --color-text: var(--lh-text);
+  --color-text-secondary: var(--lh-text-secondary);
+  --color-text-muted: var(--lh-text-muted);
+  --color-text-inverse: #ffffff;
+  --color-accent: var(--lh-text);
+  --color-accent-warm: var(--lh-text);
+  --color-accent-warm-strong: #000000;
+  --color-accent-cool: var(--lh-text);
+  --color-accent-cool-strong: #000000;
+  --shadow-sm: 0 1px 2px rgba(30, 29, 26, 0.05);
+  --shadow-md: 0 8px 20px rgba(30, 29, 26, 0.07);
+  --shadow-lg: 0 18px 42px rgba(30, 29, 26, 0.09);
+
+  background-color: var(--lh-bg);
+  background-image: radial-gradient(circle, var(--lh-dot) 0.8px, transparent 1px);
+  background-size: 18px 18px;
+  background-position: 0 0;
+}
+
+.page-home ::selection {
+  background: rgba(27, 26, 24, 0.12);
+  color: var(--lh-text);
+}
+
+/* ---- Header: compact PR monogram on a translucent light bar ---- */
+.page-home .site-header {
+  background: rgba(247, 246, 243, 0.82);
+}
+
+.page-home .nav-toggle {
+  display: inline-flex;
+}
+
+.page-home .brand {
+  color: var(--lh-text);
+}
+
+.page-home .brand__name {
+  font-size: var(--fs-base);
+  letter-spacing: var(--tracking-tight);
+}
+
+.page-home .brand__mark {
+  background: var(--lh-text);
+}
+
+.page-home .mobile-menu {
+  background: var(--lh-surface);
+}
+
+.page-home .site-footer {
+  background: transparent;
+}
+
+@media (max-width: 430px) {
+  .page-home .brand__name {
+    display: none;
+  }
+}
+
+/* ---- Hero: a clean white surface on the dotted canvas ---- */
+.home-hero {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - var(--header-height));
+  padding-block: clamp(1.5rem, 4vw, 3.5rem);
+  background: transparent;
+}
+
+.home-hero__inner {
+  display: grid;
+  gap: var(--space-12);
+  align-items: center;
+  width: 100%;
+  padding: clamp(1.5rem, 4vw, 4rem);
+  background: var(--lh-surface);
+  border: 1px solid var(--lh-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 920px) {
+  .home-hero__inner {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--space-16);
+  }
+}
+
+.home-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--lh-text-muted);
+}
+
+.home-hero__eyebrow .dot {
+  color: var(--lh-text-secondary);
+}
+
+.home-hero__title {
+  margin-top: var(--space-5);
+  font-size: var(--fs-display);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-tight);
+  color: var(--lh-text);
+}
+
+.home-hero__lead {
+  max-width: 36ch;
+  margin-top: var(--space-6);
+  color: var(--lh-text-secondary);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+}
+
+.page-home .btn--primary {
+  background: var(--lh-text);
+  color: #ffffff;
+}
+
+.page-home .btn--primary:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.home-hero__cta {
+  margin-top: var(--space-8);
+}
+
+/* Portrait frame — restrained white plate */
+.home-hero__portrait {
+  position: relative;
+  width: min(100%, 320px);
+  margin-inline: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--lh-surface-soft);
+  border: 1px solid var(--lh-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.home-hero__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-hero__portrait-caption {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-4);
+  transform: translateX(-50%);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--lh-border);
+  color: var(--lh-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Entrance choreography (runs once on load, respects reduced motion) */
+.home-hero__copy > *,
+.home-hero__portrait {
+  opacity: 0;
+  animation: home-rise 700ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+
+.home-hero__eyebrow {
+  animation-delay: 90ms;
+}
+
+.home-hero__title {
+  animation-delay: 190ms;
+}
+
+.home-hero__lead {
+  animation-delay: 300ms;
+}
+
+.home-hero__cta {
+  animation-delay: 410ms;
+}
+
+.home-hero__portrait {
+  animation-delay: 260ms;
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Identity section: HOW DO YOU KNOW ME? ---- */
+.home-identity {
+  scroll-margin-top: calc(var(--header-height) + var(--space-4));
+  padding-block: var(--space-20) var(--space-24);
+  background: transparent;
+}
+
+.home-identity .section-head {
+  margin-bottom: var(--space-16);
+}
+
+.home-identity .eyebrow {
+  color: var(--lh-text-muted);
+}
+
+.home-identity .section-title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-3xl));
+  color: var(--lh-text);
+}
+
+.home-identity .section-subtitle {
+  color: var(--lh-text-secondary);
+}
+
+.home-identity__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+.home-identity__grid > * {
+  min-width: 0;
+}
+
+@media (min-width: 920px) {
+  .home-identity__grid {
+    grid-template-columns: 1fr 340px 1fr;
+    gap: var(--space-12);
+  }
+}
+
+/* ---- Identity options: restrained text, not colored cards ---- */
+.identity-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: transform var(--transition-base);
+}
+
+.identity-card:hover,
+.identity-card:focus-within {
+  transform: translateY(-2px);
+}
+
+.identity-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--lh-border);
+}
+
+.identity-card__index,
+.identity-card__key {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--lh-text-muted);
+}
+
+.identity-card__title {
+  font-size: var(--fs-3xl);
+  letter-spacing: var(--tracking-wide);
+  color: var(--lh-text);
+}
+
+.identity-card__desc {
+  color: var(--lh-text-secondary);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+
+.identity-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.page-home .tag,
+.page-home .tag--creative,
+.page-home .tag--career {
+  background: var(--lh-surface);
+  box-shadow: inset 0 0 0 1px var(--lh-border);
+  color: var(--lh-text-secondary);
+}
+
+.identity-card__link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--lh-text);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+
+.identity-card__link:hover,
+.identity-card__link:focus-visible {
+  color: #000000;
+  text-decoration-color: currentColor;
+}
+
+.identity-card__link svg {
+  transition: transform var(--transition-base);
+}
+
+.identity-card__link:hover svg {
+  transform: translateX(4px);
+}
+
+/* ---- Portrait (identity): white plate, integrated into the canvas ---- */
+.identity-portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.portrait-interactive {
+  position: relative;
+  width: min(100%, 340px);
+  margin-inline: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--lh-surface);
+  border: 1px solid var(--lh-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.portrait-interactive svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Pupils are separate SVG groups; JS moves them to follow the pointer.
+   Transform-box keeps the pivot at each eye's own center. */
+.portrait-iris {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--transition-base);
+}
+
+.portrait-hint {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--lh-text-muted);
+}
+
+/* ---- Shared fallback when the portrait asset is unavailable ---- */
+.portrait-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(27, 26, 24, 0.04), transparent 55%),
+    var(--lh-surface-soft);
+  color: var(--lh-text-muted);
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+}

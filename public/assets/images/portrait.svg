@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-labelledby="portraitTitle">
+  <title id="portraitTitle">Illustrated placeholder portrait of a fictional person, front-facing</title>
+  <defs>
+    <linearGradient id="skinGrade" x1="0" y1="0" x2="1" y2="0.75">
+      <stop offset="0" stop-color="#ded5cc" />
+      <stop offset="1" stop-color="#c4bbb2" />
+    </linearGradient>
+    <linearGradient id="clothGrade" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#3d3d45" />
+      <stop offset="1" stop-color="#303038" />
+    </linearGradient>
+  </defs>
+
+  <!-- Torso -->
+  <path d="M64 500 C64 415 100 382 134 374 L266 374 C300 382 336 415 336 500 Z" fill="url(#clothGrade)" />
+  <path d="M336 500 C336 415 300 382 266 374 L282 500 Z" fill="#000" opacity="0.16" />
+  <!-- Collar seam + neckline -->
+  <path d="M132 374 L200 416 L268 374" fill="none" stroke="#4a4a54" stroke-width="3" opacity="0.85" stroke-linecap="round" />
+
+  <!-- Neck -->
+  <path d="M184 330 L216 330 C222 366 218 400 200 414 C182 400 178 366 184 330 Z" fill="url(#skinGrade)" />
+  <path d="M200 334 C198 368 198 396 200 408" fill="none" stroke="#a99f95" stroke-width="3" opacity="0.5" stroke-linecap="round" />
+
+  <!-- Ears (behind the face) -->
+  <circle cx="108" cy="231" r="16" fill="url(#skinGrade)" />
+  <circle cx="292" cy="231" r="16" fill="url(#skinGrade)" />
+  <path d="M98 236 q -5 7 3 13" fill="none" stroke="#a99f95" stroke-width="2.5" opacity="0.7" stroke-linecap="round" />
+  <path d="M302 236 q 5 7 -3 13" fill="none" stroke="#a99f95" stroke-width="2.5" opacity="0.7" stroke-linecap="round" />
+
+  <!-- Face -->
+  <ellipse cx="200" cy="222" rx="97" ry="120" fill="url(#skinGrade)" />
+  <ellipse cx="248" cy="252" rx="36" ry="64" fill="#000" opacity="0.035" />
+  <!-- Chin onto neck -->
+  <ellipse cx="200" cy="336" rx="44" ry="12" fill="#35302a" opacity="0.14" />
+
+  <!-- Hair (front cap with a soft fringe) -->
+  <path d="M112 214
+           C100 132 136 90 200 90
+           C264 90 300 132 288 214
+           C294 180 288 160 278 152
+           C268 144 258 156 250 146
+           C242 136 230 152 222 142
+           C214 132 200 146 192 138
+           C182 128 170 144 162 136
+           C152 128 142 140 136 150
+           C124 160 116 176 112 214 Z" fill="#24242a" />
+  <path d="M118 200 C118 138 150 102 200 98 C236 96 262 108 276 132
+           C254 116 224 112 198 118 C160 128 138 158 118 200 Z" fill="#3b3b44" opacity="0.55" />
+
+  <!-- Brows -->
+  <path d="M146 201 Q168 191 190 199" fill="none" stroke="#41342c" stroke-width="6" stroke-linecap="round" />
+  <path d="M210 199 Q232 191 254 201" fill="none" stroke="#41342c" stroke-width="6" stroke-linecap="round" />
+
+  <!-- Eyes -->
+  <!-- Left -->
+  <ellipse cx="169" cy="235" rx="22" ry="6" fill="#5a4b3c" opacity="0.12" />
+  <ellipse cx="169" cy="221" rx="23" ry="14" fill="#f5f0ea" />
+  <path d="M148 214 Q169 205 190 214" fill="none" stroke="#3a3028" stroke-width="3.4" stroke-linecap="round" />
+  <g class="portrait-iris">
+    <circle cx="169" cy="221" r="9" fill="#6c563e" />
+    <circle cx="169" cy="221" r="4.5" fill="#15120d" />
+    <circle cx="166" cy="218" r="2" fill="#fff" opacity="0.88" />
+  </g>
+  <!-- Right -->
+  <ellipse cx="231" cy="235" rx="22" ry="6" fill="#5a4b3c" opacity="0.12" />
+  <ellipse cx="231" cy="221" rx="23" ry="14" fill="#f5f0ea" />
+  <path d="M210 214 Q231 205 252 214" fill="none" stroke="#3a3028" stroke-width="3.4" stroke-linecap="round" />
+  <g class="portrait-iris">
+    <circle cx="231" cy="221" r="9" fill="#6c563e" />
+    <circle cx="231" cy="221" r="4.5" fill="#15120d" />
+    <circle cx="228" cy="218" r="2" fill="#fff" opacity="0.88" />
+  </g>
+
+  <!-- Nose -->
+  <path d="M200 240 C197 254 199 264 205 270" fill="none" stroke="#b1a79d" stroke-width="2.6" stroke-linecap="round" />
+  <path d="M191 271 q 4 4 9 1" fill="none" stroke="#ada398" stroke-width="2" stroke-linecap="round" />
+  <path d="M200 272 q 5 4 9 -1" fill="none" stroke="#ada398" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Mouth -->
+  <path d="M183 284 Q200 292 217 284" fill="none" stroke="#a27067" stroke-width="3" stroke-linecap="round" />
+  <path d="M187 287 Q200 296 213 287" fill="none" stroke="#a27067" stroke-width="2" opacity="0.3" stroke-linecap="round" />
+</svg>

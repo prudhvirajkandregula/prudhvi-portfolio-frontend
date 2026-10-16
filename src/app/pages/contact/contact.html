@@ -1,0 +1,175 @@
+<section class="page-hero">
+  <div class="container narrow">
+    <span class="eyebrow">Get in touch</span>
+    <h1>Contact</h1>
+    <p class="lead">
+      Whether it is a project to collaborate on or a question about the
+      work, the inbox is open.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-info">
+        <div class="reveal" appReveal>
+          <span class="eyebrow">Say hello</span>
+          <h2 class="section-title" style="margin-top: var(--space-4)">Leave a message</h2>
+          <p class="contact-info__blurb" style="margin-top: var(--space-4)">
+            Messages are validated and stored by the backend contact
+            service. Expect a reply for genuine enquiries.
+          </p>
+        </div>
+
+        <div class="reveal" appReveal>
+          <span class="eyebrow">Elsewhere</span>
+          <h3 style="margin-top: var(--space-4); font-size: var(--fs-lg)">Online profiles</h3>
+          <div id="contact-socials" class="socials" style="margin-top: var(--space-4)">
+            @switch (socialsState()) {
+              @case ('loading') {
+                <app-state kind="loading" title="Loading links…" />
+              }
+              @case ('error') {
+                <app-state kind="error" title="Social links unavailable" [message]="socialsErrorMessage()" />
+              }
+              @case ('empty') {
+                <app-state kind="empty" title="No social links configured yet." />
+              }
+              @case ('ready') {
+                @for (link of socials(); track $index) {
+                  <app-social-link [link]="link" />
+                }
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <form
+        #contactForm
+        id="contact-form"
+        class="contact-form reveal"
+        novalidate
+        (submit)="onSubmit($event)"
+        appReveal
+      >
+        <div id="form-alert" class="alert" role="alert" aria-live="polite" [hidden]="!alert()">
+          @if (alert(); as a) {
+            <div [class]="'alert alert--' + a.kind" tabindex="-1" #alertBox>
+              @if (a.title) {
+                <h3>{{ a.title }}</h3>
+              }
+              @if (a.detail) {
+                <p>{{ a.detail }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="field" id="field-name" [attr.data-invalid]="errors().name ? '' : null">
+            <label for="name">Name <span class="required" aria-hidden="true">*</span></label>
+            <input
+              class="control"
+              type="text"
+              id="name"
+              name="name"
+              autocomplete="name"
+              maxlength="120"
+              placeholder="Your name"
+              required
+              [value]="name()"
+              [attr.aria-invalid]="errors().name ? 'true' : 'false'"
+              (input)="onInput('name', $any($event.target).value)"
+              (blur)="onBlur('name')"
+            />
+            <p class="field-message" data-state="error" id="msg-name">{{ errors().name }}</p>
+          </div>
+
+          <div class="field" id="field-email" [attr.data-invalid]="errors().email ? '' : null">
+            <label for="email">Email <span class="required" aria-hidden="true">*</span></label>
+            <input
+              class="control"
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              maxlength="254"
+              placeholder="you@example.com"
+              required
+              [value]="email()"
+              [attr.aria-invalid]="errors().email ? 'true' : 'false'"
+              (input)="onInput('email', $any($event.target).value)"
+              (blur)="onBlur('email')"
+            />
+            <p class="field-message" data-state="error" id="msg-email">{{ errors().email }}</p>
+          </div>
+        </div>
+
+        <div class="field" id="field-subject" [attr.data-invalid]="errors().subject ? '' : null">
+          <label for="subject">Subject</label>
+          <input
+            class="control"
+            type="text"
+            id="subject"
+            name="subject"
+            maxlength="200"
+            placeholder="What is this about? (optional)"
+            [value]="subject()"
+            [attr.aria-invalid]="errors().subject ? 'true' : 'false'"
+            (input)="onInput('subject', $any($event.target).value)"
+            (blur)="onBlur('subject')"
+          />
+          <p class="field-message" data-state="hint">Optional · up to 200 characters.</p>
+          <p class="field-message" data-state="error" id="msg-subject">{{ errors().subject }}</p>
+        </div>
+
+        <div class="field" id="field-message" [attr.data-invalid]="errors().message ? '' : null">
+          <label for="message">Message <span class="required" aria-hidden="true">*</span></label>
+          <textarea
+            class="control"
+            id="message"
+            name="message"
+            rows="6"
+            maxlength="4000"
+            placeholder="Write your message…"
+            required
+            [value]="message()"
+            [attr.aria-invalid]="errors().message ? 'true' : 'false'"
+            (input)="onInput('message', $any($event.target).value)"
+            (blur)="onBlur('message')"
+          ></textarea>
+          <p class="field-message" data-state="error" id="msg-message">{{ errors().message }}</p>
+          <p
+            class="character-count"
+            id="char-count"
+            aria-live="polite"
+            [class.is-over]="charOver()"
+          >
+            {{ charCount() }} / {{ maxLength }}
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn--primary"
+            id="submit-btn"
+            [disabled]="submitting()"
+            [attr.aria-busy]="submitting()"
+          >
+            @if (submitting()) {
+              <span class="spinner" aria-hidden="true"></span> Sending…
+            } @else {
+              Send message
+            }
+          </button>
+          <p class="field-message" data-state="hint" id="form-help" style="display: block">
+            Fields marked <span class="required">*</span> are required.
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
