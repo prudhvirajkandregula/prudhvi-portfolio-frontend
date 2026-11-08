@@ -15,20 +15,20 @@ export const HOME_BRAND = { mark: 'PR', name: 'Prudhvi Raj' } as const;
 
 export const PRIMARY_LINKS: NavLink[] = [
   { path: '/', label: 'Home' },
-  { path: '/creative', label: 'Creative', tone: 'creative' },
   { path: '/career', label: 'Career', tone: 'career' },
+  { path: '/creative', label: 'Creative', tone: 'creative' },
 ];
 
 /** Homepage nav points straight at the two identity paths. */
 export const HOME_LINKS: NavLink[] = [
+  { path: '/', label: 'Home' },
   { path: '/career', label: 'About', tone: 'career' },
-  { path: '/creative', label: 'Work', tone: 'creative' },
   { path: '/contact', label: 'Contact' },
 ];
 
 export const FOOTER_LINKS: NavLink[] = [
   { path: '/', label: 'Home' },
-  { path: '/creative', label: 'Creative' },
   { path: '/career', label: 'Career' },
+  { path: '/creative', label: 'Creative' },
   { path: '/contact', label: 'Contact' },
 ];

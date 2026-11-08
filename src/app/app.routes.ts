@@ -13,7 +13,7 @@ export const routes: Routes = [
     pathMatch: 'full',
     data: {
       title: 'Kandregula Prudhvi Raj — Creative & Developer',
-      themeColor: '#f7f6f3',
+      themeColor: '#e8e7e5',
     },
   },
   {

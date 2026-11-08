@@ -68,6 +68,8 @@ export interface ContactRequest {
 export interface ContactResponse {
   status: string;
   message: string;
+  /** Whether the site owner was emailed about this message. */
+  emailNotification?: 'sent' | 'failed' | 'not_configured';
 }
 
 export interface FieldError {

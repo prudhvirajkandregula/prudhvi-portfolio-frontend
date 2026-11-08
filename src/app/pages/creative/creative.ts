@@ -38,9 +38,15 @@ export class Creative implements OnInit {
 
   private pending = false;
 
-  ngOnInit(): void {
-    this.loadInitial();
-  }
+ ngOnInit(): void {
+  document.body.classList.add('page-creative');
+
+  this.destroyRef.onDestroy(() => {
+    document.body.classList.remove('page-creative');
+  });
+
+  this.loadInitial();
+}
 
   protected selectCategory(category: string): void {
     if (this.pending || category === this.activeCategory()) return;

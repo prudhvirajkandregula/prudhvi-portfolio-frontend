@@ -3,7 +3,138 @@
    Note: the landing page styles live in css/home.css, scoped to body.page-home.
    ========================================================================== */
 
+/* ---------------- Career, Creative & Contact heroes ---------------- */
+/* These heroes have no eyebrow label, so the title starts the hero and the
+   top spacing is tightened per breakpoint. Home has no .page-hero. */
+.page-hero:is(.is-career, .is-creative, .is-contact) {
+  padding-top: var(--space-6);
+}
+
+.page-hero:is(.is-career, .is-creative, .is-contact) h1 {
+  margin-top: 0;
+}
+
+@media (min-width: 620px) {
+  .page-hero:is(.is-career, .is-creative, .is-contact) {
+    padding-top: var(--space-8);
+  }
+}
+
+@media (min-width: 900px) {
+  .page-hero:is(.is-career, .is-creative, .is-contact) {
+    padding-top: var(--space-10);
+  }
+}
+
+/* Career hero lead: one uninterrupted line on desktop. Below desktop the
+   paragraph keeps its normal wrapping so it never overflows the viewport. */
+.page-hero.is-career .lead {
+  max-width: none;
+}
+
+@media (min-width: 1024px) {
+  .page-hero.is-career .lead {
+    white-space: nowrap;
+    /* Scale just enough to keep the full sentence inside the content width. */
+    font-size: clamp(1.15rem, 1.9vw, 1.45rem);
+  }
+}
+
+/* Career & Creative: one divider rhythm. --divider-space is the gap above
+   and below every separator line (the hero line and Career's section lines);
+   the trimmed bottom padding sits before the shared footer. */
+.page-hero:is(.is-career, .is-creative),
+.page-hero:is(.is-career, .is-creative) + .section {
+  --divider-space: var(--space-8);
+}
+
+.page-hero:is(.is-career, .is-creative) {
+  padding-bottom: var(--divider-space);
+}
+
+.page-hero:is(.is-career, .is-creative) + .section {
+  padding-block: var(--divider-space) var(--space-6);
+}
+
+@media (min-width: 620px) {
+  .page-hero:is(.is-career, .is-creative),
+  .page-hero:is(.is-career, .is-creative) + .section {
+    --divider-space: var(--space-10);
+  }
+
+  .page-hero:is(.is-career, .is-creative) + .section {
+    padding-bottom: var(--space-10);
+  }
+}
+
+/* Contact keeps its own hero-to-form spacing. */
+.page-hero.is-contact .contact-hero__content {
+  max-width: none;
+}
+
+@media (min-width: 1024px) {
+  .page-hero.is-contact .lead {
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
+.page-hero.is-contact + .section {
+  padding-block: var(--space-10) var(--space-6);
+}
+
+@media (min-width: 620px) {
+  .page-hero.is-contact + .section {
+    padding-block: var(--space-12) var(--space-10);
+  }
+}
+
+@media (min-width: 900px) {
+  .page-hero.is-contact + .section {
+    padding-block: var(--space-16) var(--space-24);
+  }
+}
+
 /* ---------------- Creative ---------------- */
+
+/* Creative hero lead: exactly two lines on desktop (break after "published"),
+   with natural wrapping below desktop so it never overflows. */
+.page-hero.is-creative .lead {
+  max-width: none;
+}
+
+.page-hero.is-creative .lead-sep {
+  display: inline;
+}
+
+.page-hero.is-creative .lead-break {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .page-hero.is-creative .lead {
+    /* Sized so the longer first line fits the content width on one line. */
+    font-size: clamp(1.15rem, calc(1.85vw - 0.1rem), 1.3rem);
+  }
+
+  .page-hero.is-creative .lead-sep {
+    display: none;
+  }
+
+  .page-hero.is-creative .lead-break {
+    display: inline;
+  }
+}
+
+/* Justified card descriptions, Creative gallery only (#gallery-results).
+   Drop the global 70ch paragraph cap so the text uses the full card width. */
+#gallery-results .project-card__desc {
+  max-width: none;
+  text-align: justify;
+  text-wrap: pretty;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
 
 .creative-categories {
   display: flex;
@@ -15,7 +146,31 @@
 
 .career-sections {
   display: grid;
-  gap: var(--space-16);
+  gap: var(--divider-space);
+}
+
+/* Linked Career sections (e.g. /career#resume) clear the sticky navbar. */
+.career-sections > [id] {
+  scroll-margin-top: 112px;
+}
+
+/* Divider between Career sections, centred in the section spacing. */
+.career-sections > * + * {
+  padding-top: var(--divider-space);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Technical skills: the helper line is one sentence and should read on one
+   line on desktop. Below desktop it wraps naturally so it never overflows. */
+[aria-labelledby="skills-title"] > .section-head,
+[aria-labelledby="skills-title"] .section-subtitle {
+  max-width: none;
+}
+
+@media (min-width: 1024px) {
+  [aria-labelledby="skills-title"] .section-subtitle {
+    white-space: nowrap;
+  }
 }
 
 .skills-grid {
@@ -36,17 +191,11 @@
   }
 }
 
+/* Professional story: heading on top, paragraphs underneath. The text fills
+   the whole content column so no empty space is left on the right. */
 .career-intro {
   display: grid;
   gap: var(--space-6);
-  align-items: center;
-}
-
-@media (min-width: 860px) {
-  .career-intro {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-12);
-  }
 }
 
 .career-intro__text {
@@ -54,6 +203,36 @@
   line-height: var(--lh-normal);
   display: grid;
   gap: var(--space-4);
+  overflow-wrap: break-word;
+}
+
+/* The global 70ch paragraph measure would otherwise cap the intro text and
+   leave empty space on the right. Let it use the full available width. */
+.career-intro__text > p {
+  max-width: none;
+}
+
+/* Justify long-form Career text at every width. Hyphenation and pretty
+   wrapping keep word gaps even on narrow screens. */
+.career-intro__text > p:not(.tag),
+.career-sections .timeline-item__desc,
+.career-sections .project-card__desc {
+  text-align: justify;
+  text-wrap: pretty;
+}
+
+@media (max-width: 619px) {
+  .career-intro__text > p:not(.tag),
+  .career-sections .timeline-item__desc,
+  .career-sections .project-card__desc {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+}
+
+/* Let a long location wrap instead of widening the intro on small screens. */
+.career-intro__text .tag {
+  white-space: normal;
 }
 
 /* ---------------- Project detail ---------------- */
@@ -92,6 +271,11 @@
   }
 }
 
+/* The form alert is focused when shown; keep it clear of the sticky navbar. */
+.contact-form .alert {
+  scroll-margin-top: 120px;
+}
+
 .contact-form {
   display: grid;
   gap: var(--space-5);
@@ -121,6 +305,10 @@
 .contact-info__blurb {
   color: var(--color-text-secondary);
   line-height: var(--lh-snug);
+  text-align: justify;
+  text-wrap: pretty;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 .contact-info__email {

@@ -1,61 +1,34 @@
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
 import { LayoutService } from '../../core/layout.service';
-import { RevealDirective } from '../../shared/reveal/reveal.directive';
 
-const PORTRAIT_SRC = '/assets/images/portrait.svg';
-const GAZE_MAX = 9; // max pupil travel in SVG user units
-
-/**
- * Home page — replicates the vanilla landing page and the original eye-follow
- * animation (gaze follows pointer; Creator/Developer cards override focus).
- */
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, RevealDirective],
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit, AfterViewInit, OnDestroy {
   private readonly layout = inject(LayoutService);
+  private readonly storyRoot = viewChild<ElementRef<HTMLElement>>('storyRoot');
+  private storyEl?: HTMLElement;
+  private ticking = false;
 
-  private readonly identitySection = viewChild<ElementRef<HTMLElement>>('identitySection');
-  private readonly creatorCard = viewChild<ElementRef<HTMLElement>>('creatorCard');
-  private readonly developerCard = viewChild<ElementRef<HTMLElement>>('developerCard');
-  private readonly portraitSlot = viewChild<ElementRef<HTMLElement>>('portraitSlot');
-
-  private sectionEl?: HTMLElement;
-  private creatorEl?: HTMLElement;
-  private developerEl?: HTMLElement;
-  private slotEl?: HTMLElement;
-  private svg?: SVGSVGElement;
-  private irises: SVGElement[] = [];
-  private hintEl?: HTMLElement;
-
-  private focus: 'left' | 'right' | 'center' = 'center';
-  private pointerX: number | null = null;
-
-  private readonly onSectionPointerMove = (event: PointerEvent) => {
-    this.pointerX = event.clientX;
-    if (this.focus === 'center') this.renderGaze();
+  private readonly updateProgress = () => {
+    if (this.ticking) return;
+    this.ticking = true;
+    window.requestAnimationFrame(() => {
+      this.ticking = false;
+      if (!this.storyEl) return;
+      const rect = this.storyEl.getBoundingClientRect();
+      const travel = Math.max(1, this.storyEl.offsetHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, -rect.top / travel));
+      this.storyEl.style.setProperty('--story-progress', progress.toFixed(4));
+      const portraitProgress = Math.min(1, progress * 5);
+      this.storyEl.style.setProperty('--portrait-progress', portraitProgress.toFixed(4));
+    });
   };
-
-  private readonly onSectionPointerLeave = () => {
-    this.pointerX = null;
-    if (this.focus === 'center') this.renderGaze();
-  };
-
-  private creatorEnter?: () => void;
-  private creatorLeave?: () => void;
-  private creatorFocusIn?: () => void;
-  private creatorFocusOut?: () => void;
-
-  private developerEnter?: () => void;
-  private developerLeave?: () => void;
-  private developerFocusIn?: () => void;
-  private developerFocusOut?: () => void;
 
   ngOnInit(): void {
     this.layout.setHome(true);
@@ -63,165 +36,39 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.paintIdentityPortrait();
+    this.storyEl = this.storyRoot()?.nativeElement;
+    this.updateProgress();
+    window.addEventListener('scroll', this.updateProgress, { passive: true });
+    window.addEventListener('resize', this.updateProgress, { passive: true });
   }
 
   ngOnDestroy(): void {
     this.layout.setHome(false);
     document.body.classList.remove('page-home');
-    this.cleanupListeners();
+    window.removeEventListener('scroll', this.updateProgress);
+    window.removeEventListener('resize', this.updateProgress);
   }
 
-  private cleanupListeners(): void {
-    if (this.sectionEl) {
-      this.sectionEl.removeEventListener('pointermove', this.onSectionPointerMove);
-      this.sectionEl.removeEventListener('pointerleave', this.onSectionPointerLeave);
-    }
+  protected onExploreWork(event: Event): void {
+    event.preventDefault();
+    const section = document.getElementById('identity');
+    if (!section) return;
 
-    if (this.creatorEl) {
-      if (this.creatorEnter) this.creatorEl.removeEventListener('mouseenter', this.creatorEnter);
-      if (this.creatorLeave) this.creatorEl.removeEventListener('mouseleave', this.creatorLeave);
-      if (this.creatorFocusIn) this.creatorEl.removeEventListener('focusin', this.creatorFocusIn);
-      if (this.creatorFocusOut) this.creatorEl.removeEventListener('focusout', this.creatorFocusOut);
-    }
+    const behavior: ScrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
 
-    if (this.developerEl) {
-      if (this.developerEnter) this.developerEl.removeEventListener('mouseenter', this.developerEnter);
-      if (this.developerLeave) this.developerEl.removeEventListener('mouseleave', this.developerLeave);
-      if (this.developerFocusIn) this.developerEl.removeEventListener('focusin', this.developerFocusIn);
-      if (this.developerFocusOut) this.developerEl.removeEventListener('focusout', this.developerFocusOut);
-    }
+    const insideStory =
+      !!this.storyEl && window.getComputedStyle(section).position === 'absolute';
 
-    if (this.hintEl?.parentElement) {
-      this.hintEl.parentElement.removeChild(this.hintEl);
-    }
-  }
-
-  private async paintIdentityPortrait(): Promise<void> {
-    this.slotEl = this.portraitSlot()?.nativeElement;
-    if (!this.slotEl) return;
-
-    let markup: string;
-    try {
-      const res = await fetch(PORTRAIT_SRC);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      markup = await res.text();
-    } catch {
-      const fallback = this.portraitFallback('Illustrated portrait could not be loaded');
-      this.slotEl.replaceWith(fallback);
-      this.slotEl = undefined;
+    if (!insideStory) {
+      section.scrollIntoView({ behavior, block: 'start' });
       return;
     }
 
-    this.slotEl.innerHTML = markup;
-    const svg = this.slotEl.querySelector('svg');
-    if (!svg) {
-      const fallback = this.portraitFallback('Illustrated portrait could not be loaded');
-      this.slotEl.replaceWith(fallback);
-      this.slotEl = undefined;
-      return;
-    }
-
-    this.svg = svg as SVGSVGElement;
-
-    const finePointer =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reducedMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const supported = finePointer && !reducedMotion;
-    this.svg.dataset['gaze'] = supported ? 'dynamic' : 'static';
-    if (!supported) return;
-
-    this.irises = Array.from(this.svg.querySelectorAll('.portrait-iris'));
-    if (!this.irises.length) return;
-
-    this.sectionEl = this.identitySection()?.nativeElement;
-    this.creatorEl = this.creatorCard()?.nativeElement;
-    this.developerEl = this.developerCard()?.nativeElement;
-
-    if (this.sectionEl) {
-      this.sectionEl.addEventListener('pointermove', this.onSectionPointerMove);
-      this.sectionEl.addEventListener('pointerleave', this.onSectionPointerLeave);
-    }
-
-    this.bindCard('creator', 'left');
-    this.bindCard('developer', 'right');
-
-    const hintHost = (this.slotEl.closest('.identity-portrait') ||
-      this.slotEl.parentElement) as HTMLElement | null;
-    if (hintHost) {
-      const hint = document.createElement('p');
-      hint.className = 'portrait-hint';
-      hint.textContent = 'The eyes follow your cursor';
-      this.hintEl = hint;
-      hintHost.appendChild(hint);
-    }
-  }
-
-  private bindCard(kind: 'creator' | 'developer', when: 'left' | 'right'): void {
-    const card = kind === 'creator' ? this.creatorEl : this.developerEl;
-    if (!card) return;
-
-    const enter = () => {
-      this.focus = when;
-      this.pointerX = null;
-      this.renderGaze();
-    };
-    const leave = () => {
-      if (this.focus === when) {
-        this.focus = 'center';
-        this.renderGaze();
-      }
-    };
-
-    if (kind === 'creator') {
-      this.creatorEnter = enter;
-      this.creatorLeave = leave;
-      this.creatorFocusIn = enter;
-      this.creatorFocusOut = leave;
-      card.addEventListener('mouseenter', enter);
-      card.addEventListener('mouseleave', leave);
-      card.addEventListener('focusin', enter);
-      card.addEventListener('focusout', leave);
-    } else {
-      this.developerEnter = enter;
-      this.developerLeave = leave;
-      this.developerFocusIn = enter;
-      this.developerFocusOut = leave;
-      card.addEventListener('mouseenter', enter);
-      card.addEventListener('mouseleave', leave);
-      card.addEventListener('focusin', enter);
-      card.addEventListener('focusout', leave);
-    }
-  }
-
-  private renderGaze(): void {
-    if (!this.svg) return;
-    let x = 0;
-    if (this.focus === 'left') x = -GAZE_MAX;
-    else if (this.focus === 'right') x = GAZE_MAX;
-    else if (this.pointerX != null) {
-      const rect = this.svg.getBoundingClientRect();
-      if (rect.width > 0) {
-        const raw =
-          ((this.pointerX - rect.left - rect.width / 2) / (rect.width / 2)) * GAZE_MAX;
-        x = Math.max(-GAZE_MAX, Math.min(GAZE_MAX, raw));
-      }
-    }
-    for (const iris of this.irises) {
-      iris.style.transform = `translateX(${x.toFixed(2)}px)`;
-    }
-  }
-
-  private portraitFallback(label: string): HTMLElement {
-    const div = document.createElement('div');
-    div.className = 'portrait-fallback';
-    div.setAttribute('role', 'img');
-    div.setAttribute('aria-label', label);
-    div.textContent = 'PR';
-    return div;
+    const story = this.storyEl!;
+    const travel = Math.max(1, story.offsetHeight - window.innerHeight);
+    const storyTop = window.scrollY + story.getBoundingClientRect().top;
+    window.scrollTo({ top: storyTop + travel * 0.65, behavior });
   }
 }

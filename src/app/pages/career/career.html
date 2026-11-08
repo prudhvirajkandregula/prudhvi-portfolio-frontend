@@ -1,10 +1,9 @@
 <section class="page-hero is-career">
   <div class="container">
-    <span class="eyebrow is-career">Portfolio · Career</span>
     <h1>Career</h1>
     <p class="lead">
-      The engineering side of the journey — skills, education, experience
-      and projects built in public.
+      Developer by logic. Creator by passion. Building digital experiences
+      and creating visual stories.
     </p>
   </div>
 </section>
@@ -16,7 +15,6 @@
       <!-- Professional introduction -->
       <div class="career-intro reveal" appReveal aria-labelledby="career-intro-title">
         <div class="section-head" style="margin-bottom: 0">
-          <span class="eyebrow is-career">Introduction</span>
           <h2 class="section-title" id="career-intro-title">Professional story</h2>
         </div>
         <div id="career-about" class="career-intro__text" aria-live="polite">
@@ -31,11 +29,8 @@
               <app-state kind="empty" title="No professional introduction yet." [message]="aboutEmptyMessage()" />
             }
             @case ('ready') {
-              @if (aboutHeadline()) {
-                <p class="career-intro__headline">{{ aboutHeadline() }}</p>
-              }
-              @if (aboutText()) {
-                <p>{{ aboutText() }}</p>
+              @for (paragraph of paragraphs(aboutText()); track $index) {
+                <p>{{ paragraph }}</p>
               }
               @if (aboutLocation()) {
                 <p class="tag">Location · {{ aboutLocation() }}</p>
@@ -48,7 +43,6 @@
       <!-- Skills -->
       <div aria-labelledby="skills-title">
         <div class="section-head reveal" appReveal>
-          <span class="eyebrow is-career">Toolkit</span>
           <h2 class="section-title" id="skills-title">Technical skills</h2>
           <p class="section-subtitle">
             Grouped by area. Proficiency labels shown here are provided by the
@@ -90,7 +84,6 @@
       <!-- Experience -->
       <div aria-labelledby="experience-title">
         <div class="section-head reveal" appReveal>
-          <span class="eyebrow is-career">Experience</span>
           <h2 class="section-title" id="experience-title">Work experience</h2>
         </div>
         <div id="experience-list" class="timeline reveal" aria-live="polite" appReveal>
@@ -117,8 +110,8 @@
                   <p class="timeline-item__org">
                     {{ item.org }}@if (item.employmentType) {  ·  {{ item.employmentType }}}
                   </p>
-                  @if (item.description) {
-                    <p class="timeline-item__desc">{{ item.description }}</p>
+                  @for (paragraph of paragraphs(item.description); track $index) {
+                    <p class="timeline-item__desc">{{ paragraph }}</p>
                   }
                 </article>
               }
@@ -130,7 +123,6 @@
       <!-- Education -->
       <div aria-labelledby="education-title">
         <div class="section-head reveal" appReveal>
-          <span class="eyebrow is-career">Education</span>
           <h2 class="section-title" id="education-title">Education</h2>
         </div>
         <div id="education-list" class="timeline reveal" aria-live="polite" appReveal>
@@ -152,8 +144,8 @@
                   @if (item.qualification) {
                     <p class="timeline-item__org">{{ item.qualification }}</p>
                   }
-                  @if (item.description) {
-                    <p class="timeline-item__desc">{{ item.description }}</p>
+                  @for (paragraph of paragraphs(item.description); track $index) {
+                    <p class="timeline-item__desc">{{ paragraph }}</p>
                   }
                 </article>
               }
@@ -165,7 +157,6 @@
       <!-- Technical projects -->
       <div aria-labelledby="career-projects-title">
         <div class="section-head reveal" appReveal>
-          <span class="eyebrow is-career">Projects</span>
           <h2 class="section-title" id="career-projects-title">Technical projects</h2>
           <p class="section-subtitle">
             Backend APIs, full-stack apps and experiments.
@@ -192,9 +183,8 @@
       </div>
 
       <!-- Resume + professional links -->
-      <div aria-labelledby="resume-title">
+      <div id="resume" aria-labelledby="resume-title">
         <div class="section-head reveal" appReveal>
-          <span class="eyebrow is-career">Documents</span>
           <h2 class="section-title" id="resume-title">Resume &amp; professional links</h2>
         </div>
         <div id="resume-actions" class="pd-actions reveal" appReveal>
@@ -209,9 +199,16 @@
               <app-state kind="empty" title="No resume link configured yet." message="Set resumeUrl on the profile record in the backend." />
             }
             @case ('ready') {
+              <!-- View opens the PDF in the browser's viewer in a new tab. -->
               <a class="btn btn--ghost" [href]="resumeUrl()" target="_blank" rel="noopener noreferrer">
-                <app-icon name="download" />Download resume
+                <app-icon name="external" />View resume
               </a>
+              <!-- A same-site file can also be saved directly. -->
+              @if (resumeIsLocal()) {
+                <a class="btn btn--ghost" [href]="resumeUrl()" download="Prudhvi-Raj-Kandregula-Resume.pdf">
+                  <app-icon name="download" />Download resume
+                </a>
+              }
             }
           }
         </div>

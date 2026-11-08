@@ -5,13 +5,13 @@
 
 :root {
   /* ---- Color: light neutral foundation (unified theme) ---- */
-  --color-bg: #f7f6f3;
-  --color-bg-elevated: #ffffff;
-  --color-bg-inset: #f2f0eb;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f1efe9;
-  --color-border: #e6e4de;
-  --color-border-strong: #d9d6cf;
+  --color-bg: #e9e7ee;
+  --color-bg-elevated: #e9e7ee;
+  --color-bg-inset: #e2e0e8;
+  --color-surface: #e9e7ee;
+  --color-surface-hover: #e2e0e8;
+  --color-border: #d8d6df;
+  --color-border-strong: #c9c6d1;
 
   /* ---- Text ---- */
   --color-text: #1b1a18;

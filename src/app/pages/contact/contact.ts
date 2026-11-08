@@ -79,8 +79,14 @@ export class Contact implements OnInit {
   protected readonly socialsErrorMessage = signal('');
 
   ngOnInit(): void {
-    this.loadSocials();
-  }
+  document.body.classList.add('page-contact');
+
+  this.destroyRef.onDestroy(() => {
+    document.body.classList.remove('page-contact');
+  });
+
+  this.loadSocials();
+}
 
   /* ------------------------------------------------------------------ */
   /* Field input / blur handling                                         */
@@ -224,7 +230,23 @@ export class Contact implements OnInit {
         next: (response) => {
           this.hideAlert();
           this.resetForm();
-          this.showAlert('success', response?.message ?? 'Message received.');
+          // The backend answers 201 only after the message is stored. Say
+          // "sent" only when it also confirms the email notification went out.
+          if (response?.emailNotification === 'sent') {
+            this.showAlert(
+              'success',
+              'Message sent.',
+              "Thanks for reaching out. I'll get back to you soon."
+            );
+          } else {
+            this.showAlert(
+              'success',
+              'Message received.',
+              response?.emailNotification
+                ? "Your message was saved, but the email notification didn't go through. It won't be lost."
+                : response?.message ?? ''
+            );
+          }
         },
         error: (err) => {
           this.hideAlert();

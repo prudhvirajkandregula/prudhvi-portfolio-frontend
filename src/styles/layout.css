@@ -119,7 +119,7 @@
   top: 0;
   z-index: 100;
   height: var(--header-height);
-  background: rgba(247, 246, 243, 0.82);
+  background: rgba(232, 231, 229, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--color-border);
@@ -209,13 +209,8 @@
   .site-nav {
     display: block;
   }
-
   .nav-cta {
     display: inline-flex;
-  }
-
-  .nav-toggle {
-    display: none;
   }
 }
 
@@ -232,8 +227,15 @@
   box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
+/* Must follow the base rule above, or the desktop hide never applies. */
+@media (min-width: 860px) {
+  .nav-toggle {
+    display: none;
+  }
+}
+
 .nav-toggle[aria-expanded="true"] {
-  color: var(--color-accent);
+  color: var(--color-text);
 }
 
 /* Mobile menu panel */
@@ -280,19 +282,18 @@
 
 .site-footer__grid {
   display: grid;
-  gap: var(--space-10);
+  gap: var(--space-6);
 }
 
-@media (min-width: 780px) {
-  .site-footer__grid {
-    grid-template-columns: 1.4fr 1fr 1fr;
+.site-footer__links {
+  display: grid;
+  gap: var(--space-8);
+}
+
+@media (min-width: 620px) {
+  .site-footer__links {
+    grid-template-columns: max-content max-content;
   }
-}
-
-.site-footer__brand p {
-  color: var(--color-text-muted);
-  font-size: var(--fs-sm);
-  margin-top: var(--space-3);
 }
 
 .site-footer h3 {
@@ -396,5 +397,579 @@
 @media (min-width: 1020px) {
   .grid-projects.cols-3 {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* Homepage header composition: monogram left, links centred, menu control right. */
+.page-home .site-header {
+  background: #e9e6ec;
+  border-bottom: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* Homepage header aligns with the hero content edge. */
+.page-home .site-header__inner {
+  position: relative;
+  max-width: none;
+  padding-inline: clamp(2rem, 7vw, 7.5rem);
+}
+
+.page-home .brand {
+  gap: 0;
+}
+
+.page-home .brand__name {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .page-home .site-header__inner {
+    padding-inline: var(--gutter);
+  }
+}
+.page-home .site-nav { display: block; position: absolute; left: 50%; transform: translateX(-50%); }
+.page-home .site-header .nav-list { gap: clamp(1rem, 3vw, 3rem); }
+.page-home .site-header .nav-list a { padding: 8px 2px; border-radius: 0; color: #66625c; background: transparent; font-size: 12px; font-weight: 400; }
+.page-home .site-header .nav-list a:hover, .page-home .site-header .nav-list a[aria-current="page"] { color: #242321; background: transparent; box-shadow: none; }
+.page-home .brand { gap: 12px; font-size: 14px; }
+.page-home .brand__mark { width: 36px; height: 36px; border-radius: 50%; background: #292824; color: #eeece8; font-size: 11px; }
+.page-home .nav-toggle { display: inline-flex; width: 40px; height: 40px; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1px rgba(48,46,42,.35); }
+.page-home .nav-toggle app-icon { width: 17px; height: 17px; }
+@media (max-width: 859px) { .page-home .site-nav { display: none; } }
+
+
+/* Homepage: plain PR wordmark, not a circular badge. */
+.page-home .brand__mark {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: #242321;
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -.06em;
+}
+
+/* Final homepage PR wordmark override */
+.page-home .brand__mark {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: #242321 !important;
+  font-family: var(--font-body);
+  font-size: clamp(3.5rem, 8vw, 6rem) !important;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.07em;
+  box-shadow: none !important;
+}
+
+/* Refined homepage PR wordmark size */
+.page-home .brand__mark {
+  font-size: clamp(2.5rem, 4vw, 3.5rem) !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #242321 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Compact homepage PR wordmark */
+.page-home .brand__mark {
+  font-size: 2rem !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+}
+
+/* Final compact PR wordmark */
+.page-home .brand__mark {
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+
+/* =========================================
+   HOMEPAGE — FLOATING LIQUID GLASS NAVBAR
+   ========================================= */
+
+.page-home .site-header {
+  position: sticky;
+  top: 0;
+  height: 102px;
+  padding-top: 16px;
+  box-sizing: border-box;
+  background: transparent !important;
+  border: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.page-home .site-header__inner {
+  width: min(calc(100% - 4rem), 1200px);
+  max-width: 1200px;
+  height: 70px;
+  margin: 0 auto;
+  padding: 0 32px;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 14px;
+
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: none;
+}
+
+.page-home .brand {
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.page-home .brand__name {
+  display: none;
+}
+
+.page-home .brand__mark {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #242321 !important;
+  box-shadow: none !important;
+  font-size: 1.65rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.07em;
+}
+
+.page-home .site-nav {
+  display: block;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.page-home .site-header .nav-list {
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.page-home .site-header .nav-list a {
+  padding: 8px 2px;
+  color: #55525a;
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+
+.page-home .site-header .nav-list a:hover,
+.page-home .site-header .nav-list a[aria-current="page"] {
+  color: #171717;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-home .nav-toggle {
+  display: inline-flex !important;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(45, 42, 48, 0.2);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.page-home .nav-toggle app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 859px) {
+  .page-home .site-header {
+    height: 82px;
+    padding-top: 12px;
+  }
+
+  .page-home .site-header__inner {
+    width: calc(100% - 2rem);
+    height: 58px;
+    padding-inline: 18px;
+  }
+
+  .page-home .site-nav {
+    display: none;
+  }
+
+  .page-home .brand__mark {
+    font-size: 1.5rem !important;
+  }
+
+  .page-home .nav-toggle {
+    display: inline-flex !important;
+  }
+}
+
+
+/* Homepage floating liquid-glass navigation */
+@media (min-width: 861px) {
+  .page-home .site-header {
+    width: min(84%, 1500px);
+    height: 82px;
+    margin: 18px auto 0;
+    top: 16px;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .48);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .page-home .site-header__inner {
+    padding-inline: clamp(1.5rem, 2.5vw, 2.5rem);
+  }
+
+  .page-home .nav-toggle {
+    width: 48px;
+    height: 48px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .page-home .nav-toggle app-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+
+/* Homepage hamburger: transparent glass-bar integration */
+@media (min-width: 861px) {
+  .page-home .nav-toggle,
+  .page-home .nav-toggle:hover,
+  .page-home .nav-toggle:focus-visible {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  .page-home .nav-toggle app-icon {
+    width: 27px;
+    height: 27px;
+    background: transparent !important;
+  }
+}
+
+/* Hamburger blends into the navbar; slightly larger icon */
+@media (min-width: 861px) {
+  .page-home .nav-toggle {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .page-home .nav-toggle app-icon {
+    width: 27px !important;
+    height: 27px !important;
+    background: transparent !important;
+  }
+}
+
+
+/* Match homepage hamburger surface to the glass navbar */
+.page-home .nav-toggle,
+.page-home .nav-toggle:hover,
+.page-home .nav-toggle:focus,
+.page-home .nav-toggle:focus-visible {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.page-home .nav-toggle app-icon {
+  background: transparent !important;
+}
+
+/* Slightly larger homepage hamburger icon */
+.page-home .nav-toggle app-icon {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* Slightly larger homepage hamburger icon */
+.page-home .nav-toggle app-icon {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* Final homepage hamburger icon size */
+.page-home .nav-toggle app-icon {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+
+/* Final homepage spacing refinements */
+@media (min-width: 861px) {
+  .page-home .site-header {
+    height: 72px;
+  }
+
+  .page-home .site-header__inner {
+    height: 60px;
+  }
+}
+
+/* Give the portrait a little more room before the footer */
+.page-home .site-footer {
+  margin-top: 8rem;
+}
+
+/* Micro-adjust homepage navbar and footer spacing */
+@media (min-width: 861px) {
+  .page-home .site-header {
+    height: 68px;
+  }
+
+  .page-home .site-header__inner {
+    height: 56px;
+  }
+}
+
+.page-home .site-footer {
+  margin-top: 9rem;
+}
+
+/* Small screens: Home stacks its content, so the large footer gap is not needed. */
+@media (max-width: 900px) {
+  .page-home .site-footer {
+    margin-top: var(--space-12);
+  }
+}
+
+/* =========================================
+   INTERIOR PAGES NAVBAR (Creative, Career, Contact, Project)
+   Same floating glass bar and PR wordmark as Home.
+
+   Keyed on body:not(.page-home) rather than per-page classes: those classes
+   are only added in each page's ngOnInit, after the header has painted, so
+   styles that depend on them let the old navbar show (and transition away)
+   on every load. Breakpoint matches the base nav (860px) and the header's
+   resize handler.
+   ========================================= */
+
+body:not(.page-home) .site-header {
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body:not(.page-home) .site-header__inner {
+  position: relative;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 14px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+body:not(.page-home) .brand {
+  gap: 0;
+  flex-shrink: 0;
+}
+
+body:not(.page-home) .brand__name {
+  display: none;
+}
+
+body:not(.page-home) .brand__mark {
+  display: block;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: #242321;
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1.68px;
+}
+
+/* Nav links and the Contact link share one text-link treatment. */
+body:not(.page-home) .site-header .nav-list {
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+body:not(.page-home) .site-header .nav-list a,
+body:not(.page-home) .site-header .nav-cta {
+  padding: 8px 2px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #55525a;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+body:not(.page-home) .site-header .nav-list a:hover,
+body:not(.page-home) .site-header .nav-list a[aria-current="page"],
+body:not(.page-home) .site-header .nav-cta:hover,
+body:not(.page-home) .site-header .nav-cta[aria-current="page"] {
+  color: #171717;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Desktop: links centred, Contact on the right, no hamburger. */
+@media (min-width: 860px) {
+  body:not(.page-home) .site-header {
+    top: 16px;
+    width: 80%;
+    max-width: 1216px;
+    height: 68px;
+    margin: 34px auto 0;
+  }
+
+  body:not(.page-home) .site-header__inner {
+    max-width: none;
+    height: 56px;
+    padding: 0 32px 0 25px;
+  }
+
+  body:not(.page-home) .brand__mark {
+    font-size: 26.4px;
+    line-height: 26.4px;
+    letter-spacing: -1.848px;
+  }
+
+  body:not(.page-home) .site-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Tablet / mobile: same bar as Home's mobile header, links in the menu. */
+@media (max-width: 859px) {
+  body:not(.page-home) .site-header {
+    height: 82px;
+    padding-top: 12px;
+  }
+
+  body:not(.page-home) .site-header__inner {
+    width: calc(100% - 2rem);
+    height: 58px;
+    padding-inline: 18px;
+  }
+
+  body:not(.page-home) .site-header .nav-cta {
+    display: none;
+  }
+
+  body:not(.page-home) .nav-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body:not(.page-home) .nav-toggle app-icon {
+    width: 27px;
+    height: 27px;
+  }
+}
+
+/* Contact hero content shares the lower section's container edge. */
+.contact-hero__content {
+  max-width: 760px;
+}
+
+/* =========================================
+   MOBILE MENU — one design on every page
+   Full-height panel under the glass bar; links use the navbar's text style
+   with comfortable 52px tap targets and a darker current page.
+   ========================================= */
+
+.mobile-menu {
+  inset: 0;
+  padding-top: calc(82px + var(--space-6));
+  background: var(--color-bg-elevated);
+}
+
+.mobile-menu .nav-list {
+  gap: 0;
+}
+
+.mobile-menu .nav-list a {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #55525a;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+
+.mobile-menu .nav-list a:hover,
+.mobile-menu .nav-list a[aria-current="page"] {
+  color: #171717;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mobile-menu .nav-cta {
+  min-height: 48px;
+}
+
+/* Footer links: 44px tap targets on touch-sized screens, same look. */
+@media (max-width: 859px) {
+  .site-footer nav {
+    gap: 0;
+  }
+
+  .site-footer nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
   }
 }

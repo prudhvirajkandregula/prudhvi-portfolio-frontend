@@ -11,7 +11,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { LayoutService } from '../../core/layout.service';
 import { AppIconComponent } from '../icons/app-icon.component';
-import { BRAND, HOME_BRAND, HOME_LINKS, NavLink, PRIMARY_LINKS } from './nav-config';
+import { HOME_BRAND, HOME_LINKS, NavLink, PRIMARY_LINKS } from './nav-config';
 
 /**
  * Site header, ported from navigation.js renderHeader() + the mobile menu
@@ -30,9 +30,9 @@ import { BRAND, HOME_BRAND, HOME_LINKS, NavLink, PRIMARY_LINKS } from './nav-con
   template: `
     <header class="site-header" id="site-header">
       <div class="container site-header__inner">
-        <a class="brand" routerLink="/" [attr.aria-label]="brand().name + ' — home'">
-          <span class="brand__mark" aria-hidden="true">{{ brand().mark }}</span>
-          <span class="brand__name">{{ brand().name }}</span>
+        <a class="brand" routerLink="/" [attr.aria-label]="brand.name + ' — home'">
+          <span class="brand__mark" aria-hidden="true">{{ brand.mark }}</span>
+          <span class="brand__name">{{ brand.name }}</span>
         </a>
 
         <nav class="site-nav" aria-label="Primary">
@@ -53,7 +53,13 @@ import { BRAND, HOME_BRAND, HOME_LINKS, NavLink, PRIMARY_LINKS } from './nav-con
         </nav>
 
         @if (!layout.isHome()) {
-          <a class="btn btn--primary nav-cta" routerLink="/contact">Contact</a>
+          <a
+            class="nav-cta"
+            routerLink="/contact"
+            routerLinkActive
+            [ariaCurrentWhenActive]="'page'"
+            >Contact</a
+          >
         }
 
         <button
@@ -74,7 +80,8 @@ import { BRAND, HOME_BRAND, HOME_LINKS, NavLink, PRIMARY_LINKS } from './nav-con
 export class SiteHeaderComponent {
   protected readonly layout = inject(LayoutService);
 
-  protected readonly brand = computed(() => (this.layout.isHome() ? HOME_BRAND : BRAND));
+  /** Every page shows the same PR wordmark (the name is visually hidden). */
+  protected readonly brand = HOME_BRAND;
   protected readonly links = computed<NavLink[]>(() =>
     this.layout.isHome() ? HOME_LINKS : PRIMARY_LINKS
   );

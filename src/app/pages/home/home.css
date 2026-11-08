@@ -1,0 +1,253 @@
+
+/* Keep the first and last name on separate lines at every screen size */
+.home-hero__name-first,
+.home-hero__name-last {
+  display: block;
+}
+
+/* The homepage is one continuous, scroll-driven composition. The portrait is a single image element. */
+:host { display: block; background: #e9e7ee; }
+.home-story { --story-progress: 0; --home-content-inline: max(var(--gutter), calc((100% - var(--container-max)) / 2 + var(--gutter))); position: relative; height: 205vh; min-height: 1450px; background: #e9e7ee; }
+.home-story__stage { position: sticky; top: var(--header-height); height: calc(100svh - var(--header-height)); min-height: 620px; overflow: hidden; isolation: isolate; }
+/* Hero starts a fixed distance below the navbar, like the Career/Creative/Contact heroes. */
+.home-hero { position: absolute; inset: 0; z-index: 2; display: flex; align-items: flex-start; padding: 52px var(--home-content-inline) clamp(2rem, 7vw, 7.5rem) calc(var(--home-content-inline) - 12px); pointer-events: none; }
+.home-hero__copy { width: min(55%, 650px); transform: translate3d(calc(var(--story-progress) * -7vw), calc(var(--story-progress) * -18px), 0); opacity: clamp(0, calc(1 - var(--story-progress) * 3.2), 1); transition: none; }
+.home-hero__eyebrow, .home-hero__degree, .home-hero__side-note, .home-identity__eyebrow, .identity-card__index, .identity-card__tags, .identity-card__link { font-family: var(--font-mono); letter-spacing: .14em; font-size: 10px; }
+.home-hero__eyebrow { display: flex; align-items: center; gap: 12px; color: #77746f; margin-bottom: 28px; }
+.home-hero__eyebrow span { font-size: 17px; color: #8d8982; }
+.home-hero__title { margin-top: var(--space-5); font-family: var(--font-display); font-size: clamp(3.4rem, 7.2vw, 7.1rem); line-height: .94; font-weight: 500; letter-spacing: -.065em; color: #242321; }
+.home-hero__name-first { color: #242321; }
+.home-hero__name-last { color: #85818a; }
+.home-hero__degree { margin-top: 27px; color: #77736d; font-size: 10px; letter-spacing: .16em; }
+.home-hero__degree span { padding-inline: 7px; color: #aaa59d; }
+.home-hero__lead { max-width: 36ch; margin-top: 22px; color: #242321; font-family: var(--font-display); font-size: clamp(1.3rem, 2vw, 1.9rem); line-height: 1.25; }
+.home-hero__lead-first { color: #242321; }
+.home-hero__lead-last { color: #85818a; }
+.home-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; pointer-events: auto; }
+.home-action { display: inline-flex; align-items: center; gap: 22px; padding: 15px 19px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; transition: transform .25s ease, background .25s ease; }
+.home-action:hover { transform: translateY(-3px); }
+.home-action--dark { background: #272623; color: #f6f4ef; }
+.home-action--dark:hover { color: #fff; background: #44413b; }
+.home-action--line { border: 1px solid rgba(48,46,42,.35); color: #34322e; }
+.home-action--line:hover { color: #111; background: rgba(255,255,255,.28); }
+.home-hero__side-note { position: absolute; right: 3.5%; top: 50%; writing-mode: vertical-rl; color: #858078; font-size: 9px; }
+.home-portrait-layer { position: absolute; z-index: 3; inset: 0; pointer-events: none; }
+.home-portrait { position: absolute; width: min(75vw, 1020px); height: auto; max-width: none; right: clamp(-4rem, 1vw, 2rem); bottom: -2px; transform-origin: 50% 100%; transform: translate3d(calc(var(--story-progress) * (50% - 50vw + 1vw)), calc(var(--story-progress) * -5vh), 0) scale(calc(1 - var(--story-progress) * .28)); transition: none; mix-blend-mode: normal; }
+/* Identity columns: each column box is exactly as wide as its content
+   (--id-col, the paragraph measure), and both sit the same distance
+   (--id-edge) from their page edge, so Creator and Developer mirror each
+   other around the centred portrait. --id-edge adds back the width the box
+   used to have beyond its text, which keeps the Developer column where it was. */
+.home-identity { --id-col: min(27%, 280px); --id-edge: calc(clamp(2rem, 7vw, 8rem) + min(27%, 340px) - var(--id-col)); position: absolute; z-index: 4; inset: 0; opacity: clamp(0, calc((var(--story-progress) - 0.25) * 4), 1); pointer-events: none; background: transparent; }
+/* Staggered reveal: heading first, then both cards together. */
+.home-identity__heading { position: absolute; top: clamp(24px, 6vh, 70px); left: 50%; width: 100%; text-align: center; opacity: clamp(0, calc((var(--story-progress) - 0.30) * 5), 1); transform: translate(-50%, calc((1 - clamp(0, (var(--story-progress) - 0.30) * 5, 1)) * 28px)); }
+.home-identity__eyebrow { color: #817d75; font-size: 9px; }
+.home-identity__heading h2 { margin-top: 12px; color: #292824; font-size: clamp(2.3rem, 4.7vw, 4.8rem); font-weight: 500; letter-spacing: -.055em; }
+.home-identity__heading h2 span { color: #8d8981; }
+.identity-card { position: absolute; top: 48%; width: var(--id-col); opacity: clamp(0, calc((var(--story-progress) - 0.43) * 5), 1); }
+.identity-card--creator { left: var(--id-edge); text-align: left; transform: translate3d(calc((1 - clamp(0, (var(--story-progress) - 0.43) * 5, 1)) * -35px), -50%, 0); }
+.identity-card--developer { right: var(--id-edge); text-align: left; transform: translate3d(calc((1 - clamp(0, (var(--story-progress) - 0.43) * 5, 1)) * 35px), -50%, 0); }
+.identity-card__index { display: block; color: #89847b; font-size: 9px; }
+.identity-card h3 { margin-top: 17px; font-family: var(--font-display); font-size: clamp(2.6rem, 4vw, 4.3rem); font-weight: 500; letter-spacing: -.06em; color: #292824; }
+.identity-card h3 span { color: #9b968d; }
+.identity-card p { margin-top: 15px; max-width: none; color: #656159; font-size: 13px; line-height: 1.8; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; }
+.identity-card__tags { display: flex; flex-wrap: wrap; gap: 7px 13px; margin-top: 22px; color: #817c73; font-size: 9px; }
+.identity-card__link { display: inline-flex; gap: 16px; margin-top: 27px; padding-bottom: 8px; border-bottom: 1px solid #a9a49a; color: #37352f; font-size: 9px; pointer-events: auto; }
+.identity-card__link:hover { color: #000; border-color: #292824; }
+.home-identity__index { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); color: #8a857c; font: 9px var(--font-mono); letter-spacing: .16em; }
+
+@media (max-width: 900px) {
+  .home-story { height: 190vh; min-height: 1300px; }
+  .home-hero { padding: 44px var(--home-content-inline) 0; }
+  .home-hero__copy { width: 72%; }
+  .home-hero__title { font-size: clamp(3.2rem, 10vw, 5.5rem); }
+  .home-portrait { width: 78vw; right: -13vw; bottom: 0; }
+  .home-hero__side-note { display: none; }
+}
+/* From 861px the Home navbar is the floating glass bar, which ends 90px from
+   the top (18px margin + 16px padding + 56px bar). Pin the stage there so no
+   part of it slides under the bar. (Home's header rules switch at 859/861px,
+   so 860px is included here too.) */
+@media (min-width: 860px) {
+  .home-story__stage { top: 90px; height: calc(100svh - 90px); }
+}
+
+/* Below 860px the 82px header sits in the page flow (bar ends at 70px):
+   32px here gives the same 44px gap as the other pages' tablet heroes. */
+@media (max-width: 859px) {
+  .home-hero { padding-top: 32px; }
+}
+
+/* Phone hero typography (the stacked phone layout is at the end of this file). */
+@media (max-width: 620px) {
+  .home-hero__title {
+    font-size: clamp(3rem, 13vw, 4.6rem);
+    line-height: .98;
+    word-spacing: .015em;
+  }
+  .home-hero__name-first,
+  .home-hero__name-last {
+    white-space: nowrap;
+  }
+  .home-hero__name-last {
+    color: #85818a;
+    margin-top: .06em;
+  }
+  .home-hero__degree {
+    margin-top: 20px;
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .home-hero__lead {
+    margin-top: 24px;
+    font-size: 1.25rem;
+  }
+  .home-hero__actions {
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .home-action {
+    min-height: 44px;
+    padding: 0 16px;
+    gap: 12px;
+    font-size: 10px;
+  }
+}
+
+
+
+/* Unified studio-grey canvas: no image plate, frame, or background texture. */
+.home-story, .home-story__stage, .home-hero { background-color: #e9e7ee; }
+.home-identity { background: transparent; }
+.home-portrait-layer { background: transparent; }
+.home-portrait { border: 0; border-radius: 0; box-shadow: none; }
+
+
+/* Desktop portrait sits slightly below the stage edge. */
+@media (min-width: 901px) {
+  .home-portrait { bottom: -22px; }
+}
+
+/* Keep clear breathing room between identity heading and portrait */
+@media (min-width: 901px) {
+  .home-identity__heading {
+    top: clamp(18px, 3vh, 32px);
+  }
+
+  .home-identity__heading h2 {
+    font-size: clamp(2.3rem, 3.8vw, 4rem);
+    line-height: 1;
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Tablet portrait (621–900px wide, at least 920px tall): keep the scroll story but
+   place the cards just under the heading, clear of the centred portrait.
+   ------------------------------------------------------------------------ */
+@media (min-width: 621px) and (max-width: 900px) and (min-height: 920px) {
+  .home-identity { --id-col: 40%; --id-edge: 4vw; }
+  .identity-card { top: clamp(190px, 21vh, 270px); }
+  /* Narrow tablet columns make justified text gappy; left-align here. */
+  .identity-card p { font-size: 12px; text-align: left; text-justify: auto; }
+  .identity-card--creator {
+    transform: translate3d(calc((1 - clamp(0, (var(--story-progress) - 0.43) * 5, 1)) * -35px), 0, 0);
+  }
+  .identity-card--developer {
+    transform: translate3d(calc((1 - clamp(0, (var(--story-progress) - 0.43) * 5, 1)) * 35px), 0, 0);
+  }
+  /* The portrait is offset -13vw at this size; include that so it ends centred. */
+  .home-portrait {
+    transform: translate3d(
+      calc(var(--story-progress) * (50% - 50vw - 13vw)),
+      calc(var(--story-progress) * -5vh),
+      0
+    ) scale(calc(1 - var(--story-progress) * .28));
+  }
+}
+
+/* Narrow desktops: the vertical side note would collide with the Developer card. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .home-hero__side-note { display: none; }
+}
+
+/* ------------------------------------------------------------------------
+   Ultra-wide (> 1920px): keep the composition within a ~1680px column
+   instead of pinning it to the screen edges. Values match 1920px exactly
+   at the breakpoint, so there is no jump.
+   ------------------------------------------------------------------------ */
+@media (min-width: 1921px) {
+  .home-hero__side-note { right: calc(50vw - 893px); }
+  .home-identity { --id-edge: calc(50vw - 772px); }
+  .home-portrait {
+    right: calc(50vw - 940.8px);
+    transform: translate3d(
+      calc(var(--story-progress) * (50% - 940.8px)),
+      calc(var(--story-progress) * -5vh),
+      0
+    ) scale(calc(1 - var(--story-progress) * .28));
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Stacked layout: phones, short screens up to 900px wide (e.g. phones in
+   landscape), any screen 640px tall or less, and reduced-motion users. The pinned scroll story needs a tall
+   viewport; here the hero, portrait and both identity cards flow in order
+   instead, so nothing overlaps. Must stay last in this file so it wins over
+   the scroll-driven rules above.
+   ------------------------------------------------------------------------ */
+@media (max-width: 620px), (max-width: 900px) and (max-height: 919px), (max-height: 640px), (prefers-reduced-motion: reduce) {
+  /* Inline padding matching the site container (gutter on small screens). */
+  .home-story { --stack-inline: var(--home-content-inline); height: auto; min-height: 0; }
+  .home-story__stage {
+    position: relative; top: auto; height: auto; min-height: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  .home-hero {
+    position: relative; inset: auto; min-height: 0; display: block;
+    padding: 24px var(--stack-inline) 0; pointer-events: auto;
+  }
+  .home-hero__copy { width: 100%; max-width: 600px; transform: none; opacity: 1; }
+  .home-hero__side-note { display: none; }
+
+  .home-portrait-layer {
+    position: relative; inset: auto; display: flex; justify-content: center;
+    margin-top: var(--space-8); overflow: hidden;
+  }
+  .home-portrait {
+    position: relative; right: auto; bottom: auto; flex: none;
+    width: min(150vw, 820px); max-width: none; transform: none;
+  }
+
+  .home-identity {
+    position: relative; inset: auto; opacity: 1; pointer-events: auto;
+    display: grid; gap: var(--space-10);
+    padding: var(--space-12) var(--stack-inline) var(--space-10);
+    border-top: 1px solid var(--color-border);
+  }
+  .home-identity__heading,
+  .identity-card,
+  .identity-card--creator,
+  .identity-card--developer {
+    position: static; inset: auto; width: auto; max-width: 600px; transform: none; opacity: 1;
+  }
+  .home-identity__heading { text-align: left; }
+  .home-identity__heading h2 { font-size: clamp(2.1rem, 9vw, 3.2rem); line-height: 1.05; }
+  .home-identity__index { display: none; }
+
+  .identity-card + .identity-card { padding-top: var(--space-10); border-top: 1px solid var(--color-border); }
+  .identity-card h3 { margin-top: 8px; font-size: clamp(2.4rem, 11vw, 3.4rem); }
+  .identity-card p { max-width: 46ch; font-size: 14px; line-height: 1.7; text-align: left; text-justify: auto; }
+  .identity-card__index { font-size: 10px; letter-spacing: .12em; }
+  .identity-card__tags { gap: 6px 14px; font-size: 10px; }
+  .identity-card__link {
+    min-height: 44px; align-items: flex-end; margin-top: 8px;
+    font-size: 10px; letter-spacing: .1em;
+  }
+}
+
+/* Stacked layout under the desktop navbar (in flow 86px, bar ends at 90px):
+   56px gives the same 52px gap as the desktop heroes. */
+@media (min-width: 860px) and (max-height: 640px), (min-width: 860px) and (prefers-reduced-motion: reduce) {
+  .home-hero { padding-top: 56px; }
+}

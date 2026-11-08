@@ -313,6 +313,7 @@
 /* ---- Skill group ---- */
 .skill-group {
   display: grid;
+  align-content: start;
   gap: var(--space-3);
   padding: var(--space-6);
   border-radius: var(--radius-lg);

@@ -1,4 +1,15 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  Injector,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 
@@ -39,9 +50,11 @@ interface SkillGroup {
   imports: [AppIconComponent, ProjectCardComponent, AppStateComponent, SocialLinkComponent, RevealDirective],
   templateUrl: './career.html',
 })
-export class Career implements OnInit {
+export class Career implements OnInit, OnDestroy {
   private readonly api = inject(PortfolioApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly injector = inject(Injector);
 
   protected readonly aboutState = signal<SectionState>('loading');
   protected readonly aboutHeadline = signal('');
@@ -52,6 +65,8 @@ export class Career implements OnInit {
 
   protected readonly resumeState = signal<SectionState>('loading');
   protected readonly resumeUrl = signal<string | null>(null);
+  /** Same-site files download directly; external links open in a new tab. */
+  protected readonly resumeIsLocal = computed(() => this.resumeUrl()?.startsWith('/') ?? false);
 
   protected readonly skillsState = signal<SectionState>('loading');
   protected readonly skills = signal<Skill[]>([]);
@@ -84,10 +99,8 @@ export class Career implements OnInit {
 
   protected readonly experienceItems = computed(() =>
     this.experience().map((entry) => ({
-      date: formatDateRange(
-        entry.startDate,
-        entry.currentRole || !entry.endDate ? 'Present' : entry.endDate
-      ),
+      // A null end date makes formatDateRange render "Present".
+      date: formatDateRange(entry.startDate, entry.currentRole ? null : entry.endDate),
       role: entry.role ?? '',
       current: entry.currentRole,
       org: entry.organization ?? '',
@@ -96,9 +109,13 @@ export class Career implements OnInit {
     }))
   );
 
+  // Education is recorded by year only, so show years rather than months.
   protected readonly educationItems = computed(() =>
     this.education().map((entry) => ({
-      date: formatDateRange(entry.startDate, entry.endDate),
+      date: [entry.startDate, entry.endDate]
+        .map((value) => String(value ?? '').slice(0, 4))
+        .filter((year, index, years) => year && years.indexOf(year) === index)
+        .join(' — '),
       institution: entry.institution ?? '',
       qualification: [entry.qualification, entry.fieldOfStudy]
         .filter(Boolean)
@@ -107,8 +124,21 @@ export class Career implements OnInit {
     }))
   );
 
+  /** Backend text separates paragraphs with blank lines. */
+  protected paragraphs(text: string): string[] {
+    return text
+      .split(/\n\s*\n/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+  }
+
   ngOnInit(): void {
+    document.body.classList.add('page-career');
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    document.body.classList.remove('page-career');
   }
 
   private load(): void {
@@ -128,7 +158,22 @@ export class Career implements OnInit {
         this.applyEducation(result.education);
         this.applyProjects(result.projects);
         this.applySocials(result.socials);
+        this.scrollToFragment();
       });
+  }
+
+  /**
+   * Links such as /career#resume target sections that only take their final
+   * position once the data has rendered, so the router's immediate anchor
+   * scroll lands too early. Scroll once more after that render.
+   */
+  private scrollToFragment(): void {
+    const fragment = this.route.snapshot.fragment;
+    if (!fragment) return;
+    afterNextRender(
+      () => document.getElementById(fragment)?.scrollIntoView({ block: 'start' }),
+      { injector: this.injector }
+    );
   }
 
   private settle<T>(source: Observable<T>): Observable<Settled<T>> {
@@ -182,8 +227,17 @@ export class Career implements OnInit {
     this.aboutState.set('ready');
   }
 
+  /**
+   * Resume link: either a file served by this site (a root-relative path such
+   * as /assets/resume/file.pdf) or a vetted external http(s) URL.
+   */
+  private resumeHref(value: unknown): string | null {
+    if (typeof value === 'string' && /^\/(?!\/)[\w\-./]+$/.test(value.trim())) return value.trim();
+    return safeExternalUrl(value);
+  }
+
   private renderResume(profile: Profile | null): void {
-    const resume = profile ? safeExternalUrl(profile.resumeUrl) : null;
+    const resume = profile ? this.resumeHref(profile.resumeUrl) : null;
     if (resume) {
       this.resumeUrl.set(resume);
       this.resumeState.set('ready');
