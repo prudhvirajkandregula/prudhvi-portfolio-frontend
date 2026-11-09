@@ -63,6 +63,8 @@ export interface ContactRequest {
   email: string;
   subject: string;
   message: string;
+  /** Honeypot: hidden from people; only bots fill it in. Always sent empty by the form. */
+  website?: string;
 }
 
 export interface ContactResponse {

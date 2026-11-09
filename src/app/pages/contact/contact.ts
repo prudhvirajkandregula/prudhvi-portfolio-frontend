@@ -58,6 +58,8 @@ export class Contact implements OnInit {
   protected readonly email = signal('');
   protected readonly subject = signal('');
   protected readonly message = signal('');
+  /** Honeypot value (hidden field); a person never fills it in. */
+  protected readonly website = signal('');
 
   protected readonly errors = signal<Errors>({
     name: '',
@@ -218,6 +220,7 @@ export class Contact implements OnInit {
       email: this.email().trim(),
       subject: this.subject().trim(),
       message: this.message().trim(),
+      website: this.website(),
     };
 
     this.api
@@ -261,10 +264,15 @@ export class Contact implements OnInit {
             );
             this.focusFirstInvalid();
           } else {
+            const status = err instanceof ApiError ? err.status : 0;
             this.showAlert(
               'error',
               err instanceof Error ? err.message : errorCopy(),
-              'Check that the API gateway and contact service are running, then try again.'
+              status === 429
+                ? 'Please wait a little while before sending another message.'
+                : status === 0
+                  ? 'Check your internet connection and try again.'
+                  : 'Please try again in a moment.'
             );
           }
         },
@@ -291,6 +299,7 @@ export class Contact implements OnInit {
     this.email.set('');
     this.subject.set('');
     this.message.set('');
+    this.website.set('');
     this.errors.set({ name: '', email: '', subject: '', message: '' });
   }
 

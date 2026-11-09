@@ -110,10 +110,54 @@ describe('PortfolioApiService (Supabase Data API)', () => {
     expect((error as ApiError).message).not.toContain('permission denied');
   });
 
-  it('leaves the contact form on its existing endpoint (Phase 7)', () => {
-    service.submitContact({ name: 'a', email: 'a@b.co', subject: '', message: 'm' }).subscribe();
-    const req = http.expectOne('/api/contact');
-    expect(req.request.method).toBe('POST');
-    req.flush({ status: 'received', message: 'ok' });
+  describe('contact form (Edge Function)', () => {
+    const payload = { name: 'a', email: 'a@b.co', subject: '', message: 'm', website: '' };
+    const CONTACT = `${SUPABASE_CONFIG.url}/functions/v1/contact`;
+
+    it('posts to the contact function with only the publishable key', () => {
+      let result: unknown;
+      service.submitContact(payload).subscribe((r) => (result = r));
+      const req = http.expectOne(CONTACT);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.headers.get('apikey')).toBe(SUPABASE_CONFIG.publishableKey);
+      expect(req.request.headers.has('Authorization')).toBe(false);
+      expect(req.request.body).toEqual(payload);
+      req.flush({ status: 'received', message: 'ok' }, { status: 201, statusText: 'Created' });
+      expect(result).toEqual({ status: 'received', message: 'ok' });
+    });
+
+    it('keeps field errors from a 400 response', () => {
+      let error: ApiError | undefined;
+      service.submitContact(payload).subscribe({ error: (e) => (error = e) });
+      http.expectOne(CONTACT).flush(
+        { message: 'Please correct the highlighted fields.', fieldErrors: [{ field: 'email', message: 'must be a valid email address' }] },
+        { status: 400, statusText: 'Bad Request' }
+      );
+      expect(error?.status).toBe(400);
+      expect(error?.message).toBe('Please correct the highlighted fields.');
+      expect(error?.fieldErrors?.[0].field).toBe('email');
+    });
+
+    it('shows the rate-limit message from a 429 response', () => {
+      let error: ApiError | undefined;
+      service.submitContact(payload).subscribe({ error: (e) => (error = e) });
+      http.expectOne(CONTACT).flush(
+        { message: "You've sent several messages recently. Please try again later." },
+        { status: 429, statusText: 'Too Many Requests' }
+      );
+      expect(error?.status).toBe(429);
+      expect(error?.message).toContain('several messages');
+    });
+
+    it('never shows technical messages from other failures', () => {
+      let error: ApiError | undefined;
+      service.submitContact(payload).subscribe({ error: (e) => (error = e) });
+      http.expectOne(CONTACT).flush(
+        { code: 'INVALID_API_KEY', message: '[@supabase/server] Invalid API key' },
+        { status: 401, statusText: 'Unauthorized' }
+      );
+      expect(error?.status).toBe(401);
+      expect(error?.message).not.toContain('supabase');
+    });
   });
 });

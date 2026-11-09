@@ -10,7 +10,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { ApiError } from './api-error';
-import { CONFIG } from './config';
 import {
   ContactRequest,
   ContactResponse,
@@ -95,21 +94,19 @@ function exactCaseInsensitive(value: string): string {
  *
  * - Portfolio content (read-only) comes from the Supabase Data API, using only
  *   the public publishable key; Row Level Security limits it to reads.
- * - The contact form still posts to "/api/contact" (unchanged until Phase 7).
+ * - The contact form posts to the Supabase Edge Function "contact", which
+ *   stores messages server-side; no privileged key is ever used here.
  */
 @Injectable({ providedIn: 'root' })
 export class PortfolioApiService {
   private readonly http = inject(HttpClient);
 
   private readonly restBase = `${SUPABASE_CONFIG.url.replace(/\/+$/, '')}/rest/v1`;
+  private readonly contactUrl = `${SUPABASE_CONFIG.url.replace(/\/+$/, '')}/functions/v1/contact`;
   private readonly restHeaders = new HttpHeaders({
     apikey: SUPABASE_CONFIG.publishableKey,
     Accept: 'application/json',
   });
-
-  private url(path: string): string {
-    return `${CONFIG.getBaseUrl()}${path}`;
-  }
 
   /* ------------------------------------------------------------------ */
   /* Portfolio (read-only, Supabase Data API)                            */
@@ -189,12 +186,22 @@ export class PortfolioApiService {
   }
 
   /* ------------------------------------------------------------------ */
-  /* Contact (write) — unchanged; moves to Supabase in Phase 7           */
+  /* Contact (write, Supabase Edge Function "contact")                   */
   /* ------------------------------------------------------------------ */
 
+  /**
+   * The Edge Function validates, de-duplicates, rate-limits and stores the
+   * message server-side; the browser sends only the public publishable key.
+   */
   submitContact(payload: ContactRequest): Observable<ContactResponse> {
     return this.http
-      .post<ContactResponse>(this.url('/api/contact'), payload)
+      .post<ContactResponse>(this.contactUrl, payload, {
+        headers: new HttpHeaders({
+          apikey: SUPABASE_CONFIG.publishableKey,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }),
+      })
       .pipe(catchError((err) => this.fail(err)));
   }
 
@@ -249,16 +256,17 @@ export class PortfolioApiService {
     return data && typeof data === 'object' && !Array.isArray(data) ? (data as T) : null;
   }
 
-  /** Map an HttpErrorResponse into the same ApiError shape the pages expect. */
+  /**
+   * Map a contact-form HttpErrorResponse into the ApiError shape the page
+   * expects. Only the function's own visitor-facing messages (validation and
+   * rate limiting) are shown; anything else gets a generic message.
+   */
   private fail(err: HttpErrorResponse): Observable<never> {
     if (err instanceof ApiError) return throwError(() => err);
 
     if (err.status === 0) {
       return throwError(
-        () =>
-          new ApiError(
-            'Network error: the API gateway could not be reached. Is it running?'
-          )
+        () => new ApiError('Network error: your message could not be sent.')
       );
     }
 
@@ -266,14 +274,21 @@ export class PortfolioApiService {
       message?: string;
       fieldErrors?: FieldError[];
     };
+    const ownMessage = err.status === 400 || err.status === 429;
 
     return throwError(
       () =>
-        new ApiError(body.message || `Request failed (HTTP ${err.status}).`, {
-          status: err.status,
-          fieldErrors: Array.isArray(body.fieldErrors) ? body.fieldErrors : null,
-          body: err.error,
-        })
+        new ApiError(
+          (ownMessage && body.message) || "Sorry, your message couldn't be sent right now.",
+          {
+            status: err.status,
+            fieldErrors:
+              ownMessage && Array.isArray(body.fieldErrors)
+                ? body.fieldErrors
+                : null,
+            body: err.error,
+          }
+        )
     );
   }
 }
