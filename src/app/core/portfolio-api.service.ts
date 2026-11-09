@@ -1,4 +1,10 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpParameterCodec,
+  HttpParams,
+} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -17,94 +23,222 @@ import {
   Skill,
   SocialLink,
 } from './models';
+import { SUPABASE_CONFIG } from './supabase.config';
 
 /**
- * The single service that talks to the backend — the Angular equivalent of
- * frontend/js/api.js. Pages depend on this service and never build URLs or
- * call HttpClient themselves.
+ * PostgREST "select" lists. Column aliases (alias:column) return the same
+ * camelCase JSON the Spring Boot DTOs produced, so models.ts and every page
+ * stay unchanged. Internal ids are never selected.
+ */
+const PROFILE_COLUMNS = 'name,headline,about:about_text,location,resumeUrl:resume_url';
+const PROJECT_COLUMNS = [
+  'title',
+  'slug',
+  'shortDescription:short_description',
+  'fullDescription:full_description',
+  'type:project_type',
+  'category',
+  'thumbnailUrl:thumbnail_url',
+  'externalUrl:external_url',
+  'videoUrl:video_url',
+  'featured',
+  'displayOrder:display_order',
+  'createdAt:created_at',
+  'updatedAt:updated_at',
+].join(',');
+const SKILL_COLUMNS = 'name,category,proficiency:proficiency_label,displayOrder:display_order';
+const EDUCATION_COLUMNS =
+  'institution,qualification,fieldOfStudy:field_of_study,startDate:start_date,endDate:end_date,description';
+const EXPERIENCE_COLUMNS =
+  'organization,role,employmentType:employment_type,startDate:start_date,endDate:end_date,currentRole:is_current,description';
+const SOCIAL_LINK_COLUMNS =
+  'platform,label:display_label,url,section,displayOrder:display_order';
+
+/** Same ordering as the former portfolio-service repositories. */
+const PROJECT_ORDER = 'featured.desc,display_order.asc,id.asc';
+
+/**
+ * Angular's default query encoder leaves characters such as "+" unencoded
+ * (servers decode "+" as a space). PostgREST filter values must arrive
+ * exactly as written, so encode every key and value strictly.
+ */
+class StrictParamCodec implements HttpParameterCodec {
+  encodeKey(key: string): string {
+    return encodeURIComponent(key);
+  }
+  encodeValue(value: string): string {
+    return encodeURIComponent(value);
+  }
+  decodeKey(key: string): string {
+    return decodeURIComponent(key);
+  }
+  decodeValue(value: string): string {
+    return decodeURIComponent(value);
+  }
+}
+const STRICT_CODEC = new StrictParamCodec();
+
+/**
+ * Case-insensitive EXACT match for a category (the old API used
+ * category = ignoring case). PostgREST's "imatch" is a case-insensitive regex,
+ * so the value is anchored and its ASCII punctuation escaped to be literal.
+ */
+const ASCII_PUNCTUATION = /[!-/:-@[-`{-~]/g;
+function exactCaseInsensitive(value: string): string {
+  const literal = value.replace(ASCII_PUNCTUATION, '\\$&');
+  return 'imatch.^' + literal + '$';
+}
+
+/**
+ * The single service that talks to the backend. Pages depend on this service
+ * and never build URLs or call HttpClient themselves.
  *
- * All requests are root-relative ("/api/..."); the dev proxy forwards them to
- * the API Gateway (see proxy.conf.json).
+ * - Portfolio content (read-only) comes from the Supabase Data API, using only
+ *   the public publishable key; Row Level Security limits it to reads.
+ * - The contact form still posts to "/api/contact" (unchanged until Phase 7).
  */
 @Injectable({ providedIn: 'root' })
 export class PortfolioApiService {
   private readonly http = inject(HttpClient);
+
+  private readonly restBase = `${SUPABASE_CONFIG.url.replace(/\/+$/, '')}/rest/v1`;
+  private readonly restHeaders = new HttpHeaders({
+    apikey: SUPABASE_CONFIG.publishableKey,
+    Accept: 'application/json',
+  });
 
   private url(path: string): string {
     return `${CONFIG.getBaseUrl()}${path}`;
   }
 
   /* ------------------------------------------------------------------ */
-  /* Portfolio (read-only)                                               */
+  /* Portfolio (read-only, Supabase Data API)                            */
   /* ------------------------------------------------------------------ */
 
   getProfile(): Observable<Profile | null> {
-    return this.http.get<Profile>(this.url('/api/portfolio/profile')).pipe(
-      map((data) => this.asObject<Profile>(data)),
-      catchError((err) => this.fail(err))
+    return this.select<Profile>('profile', {
+      select: PROFILE_COLUMNS,
+      order: 'id.asc',
+      limit: '1',
+    }).pipe(
+      map((rows) => {
+        if (!rows.length) {
+          // Same outcome as the former GET /api/portfolio/profile (404).
+          throw new ApiError('Profile information has not been configured yet.', { status: 404 });
+        }
+        return this.asObject<Profile>(rows[0]);
+      })
     );
   }
 
   getProjects(options: { type?: ProjectType; category?: string } = {}): Observable<Project[]> {
-    let params = new HttpParams();
-    if (options.type) params = params.set('type', options.type);
-    if (options.category) params = params.set('category', options.category);
-
-    return this.http.get<Project[]>(this.url('/api/portfolio/projects'), { params }).pipe(
-      map((data) => (Array.isArray(data) ? data : [])),
-      catchError((err) => this.fail(err))
-    );
+    const query: Record<string, string> = { select: PROJECT_COLUMNS, order: PROJECT_ORDER };
+    if (options.type) query['project_type'] = `eq.${options.type}`;
+    const category = options.category?.trim();
+    if (category) query['category'] = exactCaseInsensitive(category);
+    return this.select<Project>('projects', query);
   }
 
   getProjectBySlug(slug: string): Observable<Project | null> {
     if (!slug) return of(null);
-    return this.http
-      .get<Project>(this.url(`/api/portfolio/projects/${encodeURIComponent(slug)}`))
-      .pipe(
-        map((data) => this.asObject<Project>(data)),
-        catchError((err) => this.fail(err))
-      );
+    return this.select<Project>('projects', {
+      select: PROJECT_COLUMNS,
+      slug: `eq.${slug}`,
+      limit: '1',
+    }).pipe(
+      map((rows) => {
+        if (!rows.length) {
+          // The project page shows its "not found" state for status 404.
+          throw new ApiError(`No project found with slug '${slug}'.`, { status: 404 });
+        }
+        return this.asObject<Project>(rows[0]);
+      })
+    );
   }
 
   getSkills(): Observable<Skill[]> {
-    return this.http.get<Skill[]>(this.url('/api/portfolio/skills')).pipe(
-      map((data) => {
-        const skills = Array.isArray(data) ? data : [];
-        return [...skills].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-      }),
-      catchError((err) => this.fail(err))
+    return this.select<Skill>('skills', {
+      select: SKILL_COLUMNS,
+      order: 'display_order.asc,id.asc',
+    }).pipe(
+      map((skills) =>
+        [...skills].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+      )
     );
   }
 
   getEducation(): Observable<Education[]> {
-    return this.http.get<Education[]>(this.url('/api/portfolio/education')).pipe(
-      map((data) => (Array.isArray(data) ? data : [])),
-      catchError((err) => this.fail(err))
-    );
+    return this.select<Education>('education', {
+      select: EDUCATION_COLUMNS,
+      order: 'start_date.desc,id.asc',
+    });
   }
 
   getExperience(): Observable<Experience[]> {
-    return this.http.get<Experience[]>(this.url('/api/portfolio/experience')).pipe(
-      map((data) => (Array.isArray(data) ? data : [])),
-      catchError((err) => this.fail(err))
-    );
+    return this.select<Experience>('experience', {
+      select: EXPERIENCE_COLUMNS,
+      order: 'start_date.desc,id.asc',
+    });
   }
 
   getSocialLinks(): Observable<SocialLink[]> {
-    return this.http.get<SocialLink[]>(this.url('/api/portfolio/social-links')).pipe(
-      map((data) => (Array.isArray(data) ? data : [])),
-      catchError((err) => this.fail(err))
-    );
+    return this.select<SocialLink>('social_links', {
+      select: SOCIAL_LINK_COLUMNS,
+      order: 'display_order.asc,id.asc',
+    });
   }
 
   /* ------------------------------------------------------------------ */
-  /* Contact (write)                                                     */
+  /* Contact (write) — unchanged; moves to Supabase in Phase 7           */
   /* ------------------------------------------------------------------ */
 
   submitContact(payload: ContactRequest): Observable<ContactResponse> {
     return this.http
       .post<ContactResponse>(this.url('/api/contact'), payload)
       .pipe(catchError((err) => this.fail(err)));
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Supabase Data API plumbing                                          */
+  /* ------------------------------------------------------------------ */
+
+  /** GET /rest/v1/{table} with PostgREST query parameters; always an array. */
+  private select<T>(table: string, query: Record<string, string>): Observable<T[]> {
+    let params = new HttpParams({ encoder: STRICT_CODEC });
+    for (const [key, value] of Object.entries(query)) params = params.set(key, value);
+
+    return this.http
+      .get<T[]>(`${this.restBase}/${table}`, { params, headers: this.restHeaders })
+      .pipe(
+        map((data) => (Array.isArray(data) ? data : [])),
+        catchError((err) => this.failData(err))
+      );
+  }
+
+  /**
+   * Errors from the Data API become ApiError with a visitor-friendly message.
+   * The raw PostgREST message (table names, SQL codes) is never shown; the
+   * HTTP status is kept so pages can keep their existing 404 / 503 handling.
+   */
+  private failData(err: HttpErrorResponse): Observable<never> {
+    if (err instanceof ApiError) return throwError(() => err);
+
+    if (err.status === 0) {
+      return throwError(
+        () =>
+          new ApiError(
+            'Network error: the portfolio content could not be reached. Check your connection and try again.'
+          )
+      );
+    }
+
+    return throwError(
+      () =>
+        new ApiError(`Portfolio content could not be loaded (HTTP ${err.status}).`, {
+          status: err.status,
+          body: err.error,
+        })
+    );
   }
 
   /* ------------------------------------------------------------------ */
