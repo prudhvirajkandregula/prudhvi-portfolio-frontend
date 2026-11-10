@@ -13,6 +13,9 @@ describe('PortfolioApiService (Supabase Data API)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
+    // Reads persist a copy in localStorage; start every test cold so the
+    // expected HTTP requests are actually issued.
+    localStorage.clear();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });

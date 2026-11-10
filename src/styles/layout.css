@@ -930,6 +930,28 @@ body:not(.page-home) .site-header .nav-cta[aria-current="page"] {
   background: var(--color-bg-elevated);
 }
 
+/* Desktop homepage: the hamburger is the only one shown at desktop widths,
+   and its expanded menu must sit inside the navbar's centred container
+   (.page-home .site-header__inner = a 1200px column inside the 84% glass
+   bar) instead of stretching across the viewport. Viewport units reproduce
+   that column's geometry from this fixed panel, so the items start at the
+   glass bar's left edge and the dividers end at its right edge. Touch
+   widths are unchanged. */
+@media (min-width: 861px) {
+  .page-home .mobile-menu .nav-list {
+    width: min(calc(84vw - 4rem), 1200px);
+    margin-inline: auto;
+  }
+
+  /* Reference-guide alignment: the link labels start ~17px inside the
+     navbar container's left edge (the red line in the design reference).
+     Only the text moves; each link's border-bottom divider still spans
+     the full list width, and all three labels share the offset. */
+  .page-home .mobile-menu .nav-list a {
+    padding-left: 17px;
+  }
+}
+
 .mobile-menu .nav-list {
   gap: 0;
 }

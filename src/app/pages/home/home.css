@@ -50,11 +50,18 @@
 .identity-card__index { display: block; color: #89847b; font-size: 9px; }
 .identity-card h3 { margin-top: 17px; font-family: var(--font-display); font-size: clamp(2.6rem, 4vw, 4.3rem); font-weight: 500; letter-spacing: -.06em; color: #292824; }
 .identity-card h3 span { color: #9b968d; }
-.identity-card p { margin-top: 15px; max-width: none; color: #656159; font-size: 13px; line-height: 1.8; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; }
-.identity-card__tags { display: flex; flex-wrap: wrap; gap: 7px 13px; margin-top: 22px; color: #817c73; font-size: 9px; }
+.identity-card p { margin-top: 22px; max-width: none; color: #656159; font-size: 13px; line-height: 1.8; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; }
+.identity-card__tags { display: flex; flex-wrap: wrap; gap: 7px 13px; margin-top: 5px; color: #817c73; font-size: 9px; }
 .identity-card__link { display: inline-flex; gap: 16px; margin-top: 27px; padding-bottom: 8px; border-bottom: 1px solid #a9a49a; color: #37352f; font-size: 9px; pointer-events: auto; }
 .identity-card__link:hover { color: #000; border-color: #292824; }
 .home-identity__index { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); color: #8a857c; font: 9px var(--font-mono); letter-spacing: .16em; }
+
+/* Desktop only: the description sits slightly closer to its skills row
+   (reference underline indicators). Same offset in both columns; the
+   stacked mobile layout keeps the base spacing above. */
+@media (min-width: 901px) {
+  .identity-card p { margin-top: 14px; }
+}
 
 @media (max-width: 900px) {
   .home-story { height: 190vh; min-height: 1300px; }
@@ -250,4 +257,51 @@
    56px gives the same 52px gap as the desktop heroes. */
 @media (min-width: 860px) and (max-height: 640px), (min-width: 860px) and (prefers-reduced-motion: reduce) {
   .home-hero { padding-top: 56px; }
+}
+
+/* ------------------------------------------------------------------------
+   Mobile scroll motion (touch-size stacked layouts only; never desktop,
+   never reduced motion). The stacked layout above stays exactly as it is;
+   this only adds the desktop story's motions on top of it, scrubbed by
+   per-block progress from home.ts (--m-*, 0 → 1):
+     hero copy   drifts -7vw / -18px and fades as it scrolls away (desktop:
+                 the same drift; the fade is spread over the hero's own height
+                 instead of 3.2x, so text is never hidden while still on screen)
+     portrait    pulls back to 72% (desktop: scale 1 → .72, bottom origin) as
+                 the identity section arrives
+     heading     fades in and rises 28px → 0 (desktop)
+     cards       fade in sliding from -35px (Creator) / +35px (Developer) (desktop)
+   Only transform and opacity change: no layout shift, compositor-only.
+   Defaults keep everything fully visible if the script has not run.
+   Must match MOBILE_MOTION_QUERY in home.ts and stay last in this file.
+   ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) and (max-width: 620px),
+       (prefers-reduced-motion: no-preference) and (max-width: 900px) and (max-height: 919px) {
+  .home-story { --m-hero: 0; --m-portrait: 0; --m-heading: 1; --m-creator: 1; --m-developer: 1; }
+
+  .home-hero__copy {
+    transform: translate3d(calc(var(--m-hero) * -7vw), calc(var(--m-hero) * -18px), 0);
+    opacity: calc(1 - var(--m-hero));
+    will-change: transform, opacity;
+  }
+  .home-portrait {
+    transform-origin: 50% 100%;
+    transform: scale(calc(1 - var(--m-portrait) * .28));
+    will-change: transform;
+  }
+  .home-identity__heading {
+    opacity: var(--m-heading);
+    transform: translate3d(0, calc((1 - var(--m-heading)) * 28px), 0);
+    will-change: transform, opacity;
+  }
+  .identity-card--creator {
+    opacity: var(--m-creator);
+    transform: translate3d(calc((1 - var(--m-creator)) * -35px), 0, 0);
+    will-change: transform, opacity;
+  }
+  .identity-card--developer {
+    opacity: var(--m-developer);
+    transform: translate3d(calc((1 - var(--m-developer)) * 35px), 0, 0);
+    will-change: transform, opacity;
+  }
 }

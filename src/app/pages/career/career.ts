@@ -41,8 +41,9 @@ interface SkillGroup {
 
 /**
  * Career page, ported from career.js. Every section loads independently
- * (forkJoin over per-request error-wrapped streams, equivalent to
- * Promise.allSettled) so a single failing endpoint never blanks the page.
+ * (per-request error-wrapped streams, equivalent to Promise.allSettled)
+ * and renders on its own subscription, so a single failing or slow
+ * endpoint never blanks the page or holds back the other sections.
  */
 @Component({
   selector: 'app-career',
@@ -142,24 +143,31 @@ export class Career implements OnInit, OnDestroy {
   }
 
   private load(): void {
-    forkJoin({
-      profile: this.settle(this.api.getProfile()),
-      skills: this.settle(this.api.getSkills()),
-      education: this.settle(this.api.getEducation()),
-      experience: this.settle(this.api.getExperience()),
-      projects: this.settle(this.api.getProjects({ type: 'CAREER' })),
-      socials: this.settle(this.api.getSocialLinks()),
-    })
+    // Each stream is error-wrapped (never fails) and each section applies
+    // its own result, so sections render progressively on a cold first
+    // visit. The API service caches these GETs, so navigating away and
+    // back replays them synchronously: every section is 'ready' before the
+    // page paints, with no loading state and no repeated request.
+    const profile = this.settle(this.api.getProfile());
+    const skills = this.settle(this.api.getSkills());
+    const education = this.settle(this.api.getEducation());
+    const experience = this.settle(this.api.getExperience());
+    const projects = this.settle(this.api.getProjects({ type: 'CAREER' }));
+    const socials = this.settle(this.api.getSocialLinks());
+
+    profile.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applyProfile(result));
+    skills.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applySkills(result));
+    experience.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applyExperience(result));
+    education.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applyEducation(result));
+    projects.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applyProjects(result));
+    socials.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => this.applySocials(result));
+
+    // The same cached streams again (no extra requests): the fragment
+    // targets only take their final positions once every section has
+    // rendered, so scroll after all of them settle.
+    forkJoin({ profile, skills, education, experience, projects, socials })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((result) => {
-        this.applyProfile(result.profile);
-        this.applySkills(result.skills);
-        this.applyExperience(result.experience);
-        this.applyEducation(result.education);
-        this.applyProjects(result.projects);
-        this.applySocials(result.socials);
-        this.scrollToFragment();
-      });
+      .subscribe(() => this.scrollToFragment());
   }
 
   /**

@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { afterNextRender, Component, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
 
+import { PortfolioApiService } from './core/portfolio-api.service';
 import { SiteHeaderComponent } from './shared/chrome/site-header.component';
 import { MobileMenuComponent } from './shared/chrome/mobile-menu.component';
 import { SiteFooterComponent } from './shared/chrome/site-footer.component';
@@ -31,8 +32,15 @@ export class App {
   private readonly router = inject(Router);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
+  private readonly api = inject(PortfolioApiService);
 
   constructor() {
+    // Warm the portfolio cache after the first paint (never blocking it):
+    // by the time the visitor opens Career, Creative or Contact, the data
+    // replays synchronously from cache and those pages render fully on
+    // their first frame, without loading states or repeated requests.
+    afterNextRender(() => this.api.prefetchPortfolioData());
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
